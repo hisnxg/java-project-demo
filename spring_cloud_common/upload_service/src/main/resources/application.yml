@@ -1,0 +1,47 @@
+server:
+  port: 9007
+#logging:
+##file: demo.log
+#  pattern:
+#    console: "%d - %msg%n"
+#  level:
+#    org.springframework.web: debug
+#      com.nxg: debug
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher #匹配规则
+      #主要原因是：Spring Boot 2.6及 更高版本使用的默认路径匹配规则是PathPatternMatcher，
+      #而Springfox使用的路径匹配是基于AntPathMatcher的
+  application:
+    name: upload-service  #微服务项目中，表示配置名称，可以自定义，起到唯一标识的作用
+  servlet:
+    multipart:
+      enabled: true  #true表示开启解析器功能,反之，false表示关闭该功能
+      max-file-size: 10MB #单个文件上传大小，最大文件size，默认1MB
+      max-request-size: 20MB #总文件上传大小，最大请求size，默认10MB
+
+fdfs:
+  # 链接超时
+  connect-timeout: 60
+  # 读取时间
+  so-timeout: 60
+  # 生成缩略图参数
+  thumb-image:
+    width: 150
+    height: 150
+  tracker-list: 139.224.55.130:22122
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:9004/eureka
+  instance:
+  #更倾向于使用ip地址，而不是主机名
+    prefer-ip-address: true
+    #ip地址
+    ip-address: 127.0.0.1
+    #续约间隔,默认30秒
+    lease-renewal-interval-in-seconds: 5
+    #服务的实效时间, 默认90秒
+    lease-expiration-duration-in-seconds: 5
+

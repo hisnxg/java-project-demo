@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../../../css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/add.css"/>
+	</head>
+	<body>
+		<div id="app">
+			<div class="header">
+				<span>删除用户信息</span>
+			</div>
+			<div class="content">
+				<table>	
+					<tr>
+						<td class="text-right">手机号码</td><td class="content_right"><input class="input inline-input" placeholder="请输入手机号码" id="userPhone"> <span class="btn btn-info" id="find">立即查找</span></td>
+					</tr>
+				</table>
+			</div>
+			
+			
+			<div class="header">
+				<span>查找信息如下</span>
+			</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td class="text-right">昵称</td><td class="content_right"><input class="input" placeholder="请输入昵称"></td>
+					</tr>
+					<tr>
+						<td class="text-right">手机号码</td><td class="content_right"><input class="input" placeholder="请输入手机号码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">身份证号码</td><td class="content_right"><input class="input" placeholder="请输入身份证号码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">密码</td><td class="content_right"><input class="input" placeholder="请输入密码"></td>
+					</tr>
+					<tr>
+						<td></td><td class="content_right"><span class="btn btn-info" id="delete">立即删除</span></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	<script src="/qrcode/jquery2.1.4.js"></script>
+	<script src="/layer/layer.js"></script>
+	<script>
+		$(".header:eq(1),.content:eq(1)").hide();
+		var userId = null;
+		$(function () {
+			$("#find").click(function () {
+				var windowId = layer.load();
+				var userPhone = $("#userPhone").val();
+				$.getJSON("/user/find.do",{userPhone:userPhone},function (data) {
+					layer.close(windowId);
+					//{"status":0,"result":"查询成功","data":{"id":81,"username":"赵六","userPhone":"15571259966","company":"顺丰快递","code":"585871","inTime":"Jul 14, 2021, 8:14:19 PM","status":0,"sysPhone":"18888886888"}}
+					layer.msg(data.result);
+					if(data.status == 0){
+						$(".header:eq(1),.content:eq(1)").fadeIn(1000);//1秒 逐渐显示
+						userId = data.data[0].id;
+						$("input:eq(1)").val(data.data[0].username);
+						$("input:eq(2)").val(data.data[0].userPhone);
+						$("input:eq(3)").val(data.data[0].identifyCard);
+						$("input:eq(4)").val(data.data[0].password);
+						//删除查询的信息是不能修改的,设置属性disabled
+						$("input:eq(1),input:eq(2),input:eq(3),input:eq(4)").prop("disabled",true);
+
+					}
+				});
+			});
+
+			$("#delete").click(function () {
+				var windowId = layer.load();
+				$.getJSON("/user/delete.do",{id:userId},function (data) {
+					layer.close(windowId);
+					layer.msg(data.result);//提示文字
+					if(data.status == 0){
+						$(".header:eq(1),.content:eq(1)").hide();
+					}
+				});
+			});
+		});
+	</script>
+</html>

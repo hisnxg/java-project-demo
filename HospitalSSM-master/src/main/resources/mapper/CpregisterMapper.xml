@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.CpregisterMapper">
+    <resultMap id="BaseResultMap" type="com.kkb.bean.Cpregister">
+        <id column="cpr_id" jdbcType="INTEGER" property="cprId"/>
+        <result column="hosR_id" jdbcType="INTEGER" property="hosrId"/>
+        <result column="chaP_id" jdbcType="INTEGER" property="chapId"/>
+        <result column="chaP_name" jdbcType="VARCHAR" property="chapName"/>
+        <result column="chaP_money" jdbcType="INTEGER" property="chapMoney"/>
+        <result column="cpr_time" jdbcType="TIMESTAMP" property="cprTime"/>
+        <result column="hosR_name" jdbcType="VARCHAR" property="hosrName"/>
+    </resultMap>
+    <resultMap id="BaseResultMap2" type="com.kkb.bean.Chargeproject">
+        <id column="chaP_id" jdbcType="INTEGER" property="chapId"/>
+        <result column="chaP_name" jdbcType="VARCHAR" property="chapName"/>
+        <result column="chaP_money" jdbcType="DECIMAL" property="chapMoney"/>
+    </resultMap>
+    <select id="selectChargeProject" resultMap="BaseResultMap2">
+        select *
+        from chargeproject
+        where chaP_name = #{chapName}
+    </select>
+    <select id="selectCpregisterByParam" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cpregister
+        where
+        1=1
+        <if test="hosrId != null and hosrId != ''">
+            AND hosR_id like concat('%',#{hosrId},'%')
+        </if>
+        <if test="hosrName != null and hosrName != ''">
+            AND hosR_name like concat('%',#{hosrName},'%')
+        </if>
+        group by hosR_id
+    </select>
+    <select id="selectCpregisterById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cpregister
+        where hosR_id = #{hosrId,jdbcType=INTEGER}
+    </select>
+    <insert id="insertByParam" parameterType="com.kkb.vo.cpregistermanager.req.AddNewCPParam">
+        insert into cpregister (hosR_id, chaP_id,
+                                chaP_name, chaP_money, hosR_name)
+        values (#{hosrId,jdbcType=INTEGER}, #{chapId,jdbcType=INTEGER},
+                #{chapName,jdbcType=VARCHAR}, #{chapMoney,jdbcType=INTEGER},
+                #{hosrName,jdbcType=VARCHAR})
+    </insert>
+    <select id="selectCost" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT SUM(chaP_money) as cost
+        FROM `cpregister`
+        WHERE hosR_id = #{hosrId,jdbcType=INTEGER};
+    </select>
+
+
+    <sql id="Base_Column_List">
+        cpr_id
+        , hosR_id, chaP_id, chaP_name, chaP_money, cpr_time, hosR_name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from cpregister
+        where cpr_id = #{cprId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from cpregister
+        where cpr_id = #{cprId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.kkb.bean.Cpregister">
+        insert into cpregister (cpr_id, hosR_id, chaP_id,
+                                chaP_name, chaP_money, cpr_time, hosR_name)
+        values (#{cprId,jdbcType=INTEGER}, #{hosrId,jdbcType=INTEGER}, #{chapId,jdbcType=INTEGER},
+                #{chapName,jdbcType=VARCHAR}, #{chapMoney,jdbcType=INTEGER}, #{cprTime,jdbcType=TIMESTAMP},
+                #{hosrName,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.kkb.bean.Cpregister">
+        insert into cpregister
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cprId != null">
+                cpr_id,
+            </if>
+            <if test="hosrId != null">
+                hosR_id,
+            </if>
+            <if test="chapId != null">
+                chaP_id,
+            </if>
+            <if test="chapName != null">
+                chaP_name,
+            </if>
+            <if test="chapMoney != null">
+                chaP_money,
+            </if>
+            <if test="cprTime != null">
+                cpr_time,
+            </if>
+            <if test="hosrName != null">
+                hosR_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cprId != null">
+                #{cprId,jdbcType=INTEGER},
+            </if>
+            <if test="hosrId != null">
+                #{hosrId,jdbcType=INTEGER},
+            </if>
+            <if test="chapId != null">
+                #{chapId,jdbcType=INTEGER},
+            </if>
+            <if test="chapName != null">
+                #{chapName,jdbcType=VARCHAR},
+            </if>
+            <if test="chapMoney != null">
+                #{chapMoney,jdbcType=INTEGER},
+            </if>
+            <if test="cprTime != null">
+                #{cprTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="hosrName != null">
+                #{hosrName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.Cpregister">
+        update cpregister
+        <set>
+            <if test="hosrId != null">
+                hosR_id = #{hosrId,jdbcType=INTEGER},
+            </if>
+            <if test="chapId != null">
+                chaP_id = #{chapId,jdbcType=INTEGER},
+            </if>
+            <if test="chapName != null">
+                chaP_name = #{chapName,jdbcType=VARCHAR},
+            </if>
+            <if test="chapMoney != null">
+                chaP_money = #{chapMoney,jdbcType=INTEGER},
+            </if>
+            <if test="cprTime != null">
+                cpr_time = #{cprTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="hosrName != null">
+                hosR_name = #{hosrName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where cpr_id = #{cprId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.kkb.bean.Cpregister">
+        update cpregister
+        set hosR_id    = #{hosrId,jdbcType=INTEGER},
+            chaP_id    = #{chapId,jdbcType=INTEGER},
+            chaP_name  = #{chapName,jdbcType=VARCHAR},
+            chaP_money = #{chapMoney,jdbcType=INTEGER},
+            cpr_time   = #{cprTime,jdbcType=TIMESTAMP},
+            hosR_name  = #{hosrName,jdbcType=VARCHAR}
+        where cpr_id = #{cprId,jdbcType=INTEGER}
+    </update>
+</mapper>

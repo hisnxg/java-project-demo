@@ -1,0 +1,32 @@
+server:
+  port: 8086
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: service2
+          #uri:http://127.0.0.1:9001
+          uri: lb://cloud-bill-service
+          predicates: #断言
+            - Path=/api/bill/** # **指任意子路径 ，方式1
+           # - Path=/payment/{segment} #片段语法，方式2
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*" # spring boot2.4配置
+            #            allowed-origins: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            allowed-methods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+              - OPTION
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8088/eureka

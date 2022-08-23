@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加药品--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        let drugId = window.location.href.split("?")[1].split("=")[1];
+        $(function () {
+            $('#backid').click(function(){
+                window.location.href="index.html";
+            });
+            initData(drugId);
+            $('#baocun').click(function (){
+                let drId = $("#drId").text();
+                let drInprice = $("#drInprice").val();
+                let drOutprice = $("#drOutprice").val();
+                let drName = $("#drName").text();
+                let drType = $("#drType").val();
+                let drSimdesc = $("#drSimdesc").val();
+                let drQgp = $("#drQgp").val();
+                let drDetadesc = $("#drDetadesc").val();
+                let drFatory = $("#drFatory").val();
+                let drDirection = $("#drDirection").val();
+                let drRemark = $("#drRemark").val();
+                let drNumber = $("#drNumber").val();
+                $.ajax({
+                    url:"updateDrugById",
+                    data:{"drId":drId,"drInprice":drInprice,"drOutprice":drOutprice,
+                        "drName":drName,"drType":drType,"drSimdesc":drSimdesc,"drQgp":drQgp,
+                        "drDetadesc":drDetadesc,"drFatory":drFatory,"drDirection":drDirection,
+                        "drRemark":drRemark,"drNumber":drNumber},
+                    type:"post",
+                    dataType:"json",
+                    success:function (data){
+                        let code = data.response.code;
+                        if (code==200){
+                            alert("更新成功！");
+                        }else {
+                            alert("更新失败！");
+                        }
+                    }
+                })
+            })
+        });
+
+        function initData(drugId){
+            $.ajax({
+                url:"queryDrugById",
+                data:{"drugId":drugId},
+                type: "get",
+                dataType: "json",
+                success:function (data) {
+                    console.log(drugId);
+                    let code = data.code;
+                    if (code==200){
+                        console.log(code);
+                        let drug = data.data.drug;
+                        $("#drId").text(drugId);
+                        $("#drInprice").val(drug.drInprice);
+                        $("#drOutprice").val(drug.drOutprice);
+                        $("#drName").text(drug.drName);
+                        $("#drType").val(drug.drType);
+                        //TODO 单选框自动选择
+                        $("#drSimdesc").val(drug.drSimdesc);
+                        $("#drQgp").val(drug.drQgp);
+                        $("#drDetadesc").val(drug.drDetadesc);
+                        $("#drFatory").val(drug.drFatory);
+                        $("#drDirection").val(drug.drDirection);
+                        $("#drNumber").val(drug.drNumber);
+                        $("#drRemark").val(drug.drRemark);
+                    }else {
+                        alert("查询失败！请返回")
+                    }
+                }
+            })
+        }
+
+
+    </script>
+</head>
+<body>
+<form action="#" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td width="10%" class="tableleft">药品编号</td>
+            <td><span id="drId"></span></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">图片</td>
+            <td><img id="imgUrl" src="1.png"/></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">进价</td>
+            <td><input id="drInprice" type="text" name="pname" value=""/></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">售价</td>
+            <td><input id="drOutprice" type="text" name="pname" value=""/></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">药品名称</td>
+            <td><span id="drName"></span></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">药品类型</td>
+            <td><input id="drType" class="drType" type="radio" name="pname0" value="处方药" checked/>处方药&nbsp;&nbsp;&nbsp;<input type="radio" name="pname0" value="中药"/>中药&nbsp;&nbsp;&nbsp;<input type="radio" name="pname0" value="西药"/>西药</td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">简单描述</td>
+            <td><input id="drSimdesc" type="text" name="pname" value=""/></td>
+        </tr>
+
+        <tr>
+            <td width="10%" class="tableleft">保质期</td>
+            <td><input id="drQgp" type="text" name="pname" value="36"/></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">详细描述</td>
+            <td><textarea id="drDetadesc"></textarea></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">生产厂商</td>
+            <td><textarea id="drFatory"></textarea></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">服用说明</td>
+            <td><input id="drDirection" type="text" name="pname" value=""/></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">剩余量</td>
+            <td><input id="drNumber" type="text" name="pname" value=""></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">备注</td>
+            <td><textarea id="drRemark"></textarea></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <center>
+                    <button id="baocun" class="btn btn-primary" type="button">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+                </center>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

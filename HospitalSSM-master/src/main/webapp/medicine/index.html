@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>药品查询--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+
+	 $(function () {
+		$('#newNav').click(function(){
+				window.location.href="add.html";
+		 });
+         //初始化数据
+         initData("","");
+
+    });
+     function initData(drugName,drugType){
+         $.ajax({
+             url: "queryDrug",
+             data: {"drugName":drugName,'drugType':drugType},
+             type: 'get',
+             dataType: 'json',
+             success: function (data){
+                 //清空下级标签
+                 $("#xunhuan").empty();
+                 let page = data.data.drugPage;
+                 let param = data.data.param;
+                 let list = page.list;
+                 //遍历数据
+                 $.each(list,function (index,drug){
+                     $("#xunhuan").append(
+                         "<tr >\n" +
+                         "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"1\"></td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drId+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drName+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drType+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drSimdesc+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drNumber+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+drug.drNumber+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\"><a href=\"update.html?drugId="+drug.drId+"\">更改</a>&nbsp;&nbsp;&nbsp;<a href=\"add_medicine.html?drugId="+drug.drId+"\">添加库存</a>&nbsp;&nbsp;&nbsp; <a href=\"look.html?drugId="+drug.drId+"\">详情>>></a></td>" +
+                         "</tr>")
+                     //查询参数回显
+                     $("#drugName").val(param.drugName);
+                     $("#drugType").val(param.drugType);
+                     /**
+                      * layout 参数说明：
+                      *
+                      * total： 总条数
+                      * sizes: 显示每页条数选择框， TODO:pageSizes参数必填,否则无法生效
+                      * home： 首页按钮
+                      * prev： 上一页按钮
+                      * pager： 页码
+                      * last： 尾页按钮
+                      * next： 下一页按钮
+                      * jumper： 输入框跳转（包含事件：失去焦点，回车）触发
+                      *
+                      * */
+                     new Pagination({
+                         element: '#pages',
+                         type: 2,
+                         layout: 'prev, pager, next, total, jumper',
+                         pageIndex: 1,
+                         pageSize: 5,
+                         pageCount: 9,
+                         total: page.total,
+                         singlePageHide: false,
+                         disabled: true,
+                         currentChange: function(index) {
+                             console.log(index);
+                             $.ajax({
+                                 url: "queryDrug",
+                                 data: {"pageNum":index,"drugName":drugName,'drugType':drugType},
+                                 type: 'get',
+                                 dataType: 'json',
+                                 success: function (data){
+                                     //清空下级标签
+                                     $("#xunhuan").empty();
+                                     let page = data.data.drugPage;
+                                     let param = data.data.param;
+                                     let list = page.list;
+                                     //遍历数据
+                                     $.each(list,function (index,drug){
+                                         $("#xunhuan").append(
+                                             "<tr >\n" +
+                                             "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"1\"></td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drId+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drName+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drType+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drSimdesc+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drNumber+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+drug.drNumber+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\"><a href=\"update.html?drugId="+drug.drId+"\">更改</a>&nbsp;&nbsp;&nbsp;<a href=\"add_medicine.html?drugId="+drug.drId+"\">添加库存</a>&nbsp;&nbsp;&nbsp; <a href=\"look.html?drugId="+drug.drId+"\">详情>>></a></td>" +
+                                             "</tr>")
+                                         //查询参数回显
+                                         $("#drugName").val(param.drugName);
+                                         $("#drugType").val(param.drugType);
+                                     })
+                                 }
+                             });
+                         }
+                     });
+                     //分页
+                     // $("#pageNum").text(page.pageNum+"/"+page.pages);
+                     // $("#totalMsg").text(page.total);
+
+                     //$("#first").attr("href","/medicine/queryDrug?pageNum=1&drugName="+param.drugName+"&drugType="+param.drugType);
+                     /*if (page.prePage==0){
+                         $("#previous").attr("href","/medicine/queryDrug?pageNum=1&drugName="+param.drugName+"&drugType="+param.drugType);
+                     }else {
+                         $("#previous").attr("href","/medicine/queryDrug?pageNum="+page.prePage+"&drugName="+param.drugName+"&drugType="+param.drugType);
+                     }
+                     if (page.nextPage==0){
+                         $("#next").attr("href","/medicine/queryDrug?pageNum="+page.pages+"&drugName="+param.drugName+"&drugType="+param.drugType);
+                     }else {
+                         $("#next").attr("href","/medicine/queryDrug?pageNum="+page.nextPage+"&drugName="+param.drugName+"&drugType="+param.drugType);
+                     }
+                     $("#last").attr("href","/medicine/queryDrug?pageNum="+page.lastPage+"&drugName="+param.drugName+"&drugType="+param.drugType);*/
+                     /*$("#next").click(function (){
+                         if (page.nextPage==0){
+                             pageNum = page.pages;
+                             initData(pageNum,drugName,drugType);
+                         }else {
+                             pageNum = page.nextPage;
+                             initData(pageNum,drugName,drugType);
+                         }
+
+                     })*/
+                 })
+             }
+         });
+     }
+
+     function queryDrug(){
+         let drugName = $("#drugName").val();
+         let drugType = $("#drugType").val();
+         initData(drugName,drugType);
+     }
+
+     function resetQuery() {
+        $("#drugName").val("");
+        $("#drugType").val("");
+        queryDrug();
+     }
+	
+    	function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;	
+				}	
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;	
+				}	
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}		
+			}
+			if(ids.length>0){
+				if(confirm("确认操作?")){
+					alert("成功!");
+				}
+			}else{
+				alert("请选中要操作的项");
+			}
+		}
+     //导出excel
+     function exportExcel(){
+         var ids = [];
+         $("input[name='check']:checked").each(function(i){
+             ids.push($(this).val())
+             //$("body").append("<p>"+$(this).val()+"</p>")
+         })
+         //console.log(ids)
+         if (ids.length>0) {
+             $.ajax({
+                 url: "exportExcelDrug",
+                 data:{"drugIds": ids},
+                 traditional: true,
+                 success:function (resp){
+                     //TODO
+                     if (resp.response.flag){
+                         console.log("sdfsdf")
+                         window.location.href = "http://localhost:8080/downloadFile?fileName=drugMsg.xls"
+                     }else {
+
+                     }
+                 }
+             })
+         }else {
+             alert("请选择要导出的数据");
+         }
+     }
+    </script>
+</head>
+<body>
+
+<form action="#" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">药品名称：</td>
+        <td><input id="drugName" type="text" name="drugName" value=""/></td>
+        <td width="10%" class="tableleft">药品类型：</td>
+        <td><select id="drugType" name="drugType"><option value="中药">中药</option><option value="西药">西药</option><option value="处方药">处方药</option></select></td>
+    </tr>
+    <tr>
+        <td colspan="4">
+			<center>
+				<button class="btn btn-primary" type="button" onclick="queryDrug()">查询</button>
+				<button class="btn btn-primary" type="button" onclick="resetQuery()">清空</button>
+			</center>
+        </td>
+    </tr>
+</table>
+</form>
+   
+<table class="table table-bordered table-hover definewidth m10" >
+   <thead>
+    <tr>
+    	<th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>药品编号</th>
+        <th>药品名称</th>
+        <th>药品类型</th>
+        <th>简单描述</th>
+        <th>状态</th>
+        <th>剩余量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="xunhuan">
+        <tr >
+            <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">J1121</td>
+            <td style="vertical-align:middle;">感冒药</td>
+            <td style="vertical-align:middle;">处方</td>
+            <td style="vertical-align:middle;">用于普通感冒</td>
+            <td style="vertical-align:middle;">销售中</td>
+            <td style="vertical-align:middle;">1000袋</td>
+            <td style="vertical-align:middle;">
+                <a href="add.html">更改</a>&nbsp;&nbsp;&nbsp;
+                <a href="add_medicine.html">添加库存</a>&nbsp;&nbsp;&nbsp;
+                <a href="look.html">详情>>></a>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+  
+  <table class="table table-bordered table-hover definewidth m10" >
+  	<tr><th colspan="5">
+        <div class="inline pull-right page" id="pages" style="height: 20px">
+            <!--<a id="first" href='/queryDrug?pageNum=1' >首页</a>
+            <a id="previous" href='/queryDrug?pageNum='>上一页</a>     <span class='current'>1</span><a href='#'>2</a><a href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a>
+            <a id="next" href='#' >下一页</a>
+            <a id="last" href='/queryDrug' >尾页</a>
+              &nbsp;&nbsp;&nbsp;共<span id="totalMsg" class='current'>32</span>条记录
+            第<span id="pageNum" class='current'> 1/33 </span>页-->
+        </div>
+		 <div>
+			<button type="button" class="btn btn-success" id="newNav">添加新药</button>
+			<button type="button" class="btn btn-success" id="exportDrug" onclick="exportExcel()">导出Excel</button>
+		 </div>
+
+		 
+		 </th></tr>
+  </table>
+
+</body>
+<script>
+    $(function (){
+        $.getJSON("",null,function (data){
+
+        })
+    })
+</script>
+</html>

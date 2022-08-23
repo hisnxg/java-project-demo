@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>门诊医生--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+	 $(function () {
+		$('#newNav').click(function(){
+				window.location.href="add.html";
+		 });
+    });
+	
+    	function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;	
+				}	
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;	
+				}	
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}		
+			}
+			if(ids.length>0){
+				if(confirm("确认操作?")){
+					alert("成功!");
+				}
+			}else{
+				alert("请选中要操作的项");
+			}
+		}
+    </script>
+</head>
+<body>
+
+<form id="myForm" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">医生编号：</td>
+        <td><input type="text" name="doctorId" value=""/></td>
+		
+        <td width="10%" class="tableleft">医生姓名：</td>
+        <td><input type="text" name="doctorName" value=""/></td>
+		
+        <td width="10%" class="tableleft">科室：</td>
+        <td><input type="text" name="deptName" value=""/></td>
+    </tr>
+    <tr>
+		  <td colspan="6"><center>
+            <button type="submit" class="btn btn-primary" type="button">查询</button> 
+            <button type="submit" class="btn btn-primary" type="button">清空</button> 
+			</center>
+        </td>
+    </tr>
+</table>
+</form>
+   
+<table class="table table-bordered table-hover definewidth m10" >
+   <thead>
+    <tr>
+    	<th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>医生编号</th>
+        <th>医生姓名</th>
+        <th>入院时间</th>
+        <th>所属科室</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+	     <tr >
+         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1103</td>
+            <td style="vertical-align:middle;">程俊</td>
+            <td style="vertical-align:middle;">2015-09-09 12：12：12</td>
+            <td style="vertical-align:middle;">血液科</td>
+            <td style="vertical-align:middle;"><a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;<a href="edit.html">更改</a></td>
+        </tr>
+	     <tr >
+         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1104</td>
+            <td style="vertical-align:middle;">王博</td>
+            <td style="vertical-align:middle;">2015-12-09 12：12：12</td>
+            <td style="vertical-align:middle;">骨科</td>
+            <td style="vertical-align:middle;"><a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;<a href="edit.html">更改</a></td>
+        </tr>
+	     <tr >
+         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1105</td>
+            <td style="vertical-align:middle;">沈青川</td>
+            <td style="vertical-align:middle;">2015-02-04 15：11：12</td>
+            <td style="vertical-align:middle;">外科</td>
+            <td style="vertical-align:middle;"><a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;<a href="edit.html">更改</a></td>
+        </tr>
+	     <tr >
+         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1106</td>
+            <td style="vertical-align:middle;">欧阳雨露</td>
+            <td style="vertical-align:middle;">2014-09-05 12：12：12</td>
+            <td style="vertical-align:middle;">急诊科</td>
+            <td style="vertical-align:middle;"><a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;<a href="edit.html">更改</a></td>
+        </tr>
+	     <tr >
+         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1107</td>
+            <td style="vertical-align:middle;">艾小天</td>
+            <td style="vertical-align:middle;">2014-02-09 12：12：11</td>
+            <td style="vertical-align:middle;">妇科</td>
+            <td style="vertical-align:middle;"><a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;<a href="edit.html">更改</a></td>
+        </tr>
+  </table>
+  
+  <table class="table table-bordered table-hover definewidth m10" >
+  	<tr><th colspan="5">
+        <div class="inline pull-right page" id="pagination">
+          <a href='javascript:void(0)' id="firstPage" >第一页</a>
+           <a href='javascript:void(0)' id="prePage">上一页</a>
+            <span class='current'>1</span><a href='#'>2</a>
+            <a href='/chinapost/index.php?m=Label&a=index&p=3'>3</a>
+            <a href='#'>4</a><a href='#'>5</a>
+            <a href='javascript:void(0)' id="nextPage" >下一页</a>
+            <a href='javascript:void(0)' id="lastPage">最后一页</a>
+		  &nbsp;&nbsp;&nbsp;共<span class='current' id="total">32</span>条记录<span class='current' id="pageNum"> 1</span>/<span id="pages">33 </span>页
+		  </div>
+		 <div><button type="button" class="btn btn-success" id="newNav">添加新医生</button>
+		 <button type="button" class="btn btn-success" id="delPro">导出Excel</button>
+		 </div>
+		 </th></tr>
+  </table>
+  
+</body>
+<script>
+    //页面加载完毕之后发送异步请求
+    $(function (){
+        loadData();
+        $("#pagination a").click(function (){
+            if (($(this).attr("class"))=='disable'){
+                return;
+            }
+
+        });
+    });
+
+    //填充分页信息
+    function fillPageData(pageInfo){
+        //填充信息
+        $("#total").html(pageInfo.total);
+        $("#pages").html(pageInfo.pages);
+        $("#pageNum").html(pageInfo.pageNum);
+        //$("#pageSize").html(5);
+        //设置按钮的属性值和样式
+        $("#firstPage").attr("name",1);
+        $("#prePage").attr("name",pageInfo.prePage);
+        $("#nextPage").attr("name",pageInfo.nextPage);
+        $("#lastPage").attr("name",pageInfo.pages);
+        $("#firstPage").removeClass("disabled");
+        $("#prePage").removeClass("disabled");
+        $("#nextPage").removeClass("disabled");
+        $("#lastPage").removeClass("disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#firstPage").addClass("disabled");
+            $("#prePage").addClass("disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#nextPage").addClass("disabled");
+            $("#lastPage").addClass("disabled");
+        }
+    }
+    //更新按钮
+    function updateDoctor(id) {
+        let pageNum=$("#pageNum").val();
+        let pageSize=5;
+        window.location.href="/doctor/edit.html?doctorId="+id+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+    //加载数据
+    function loadData(){
+        let url = document.location.toString();
+        let pageNum=url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+        if(pageNum!=null&&$("#pageNum").val()!=null){
+            $("#pageNum").val(pageNum);
+        }
+
+        $.ajax({
+            type:"GET",
+            url:"/doctor/list",
+            data:$("#myForm").serialize(),
+            dataType:"json",
+            success:function (vo){
+                let list=vo.pageInfo.list;
+                let str="";
+                for (let i = 0; i < list.length; i++) {
+                    let obj=list[i];
+                    let doctorId=obj.doctorId;
+                    let doctorName=obj.doctorName;
+                }
+            }
+        });
+
+
+    }
+
+</script>
+</html>

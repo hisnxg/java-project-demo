@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: cloud-bill-service
+  cloud:
+    config:
+      # 要与仓库中的配置文件的applicaton保持一致
+      name: bill
+      # 要与仓库中的配置我呢间的profile保持一致
+      profile: dev
+      # 要与仓库中的配置文件所属的版本（分支）一样
+      label: master
+      uri: http://localhost:9006
+  config:
+    import: optional:configserver:http://localhost:9006
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: guest
+    port: 5672
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8088/eureka
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
+  endpoint:
+    bus-refresh:
+      enabled: true

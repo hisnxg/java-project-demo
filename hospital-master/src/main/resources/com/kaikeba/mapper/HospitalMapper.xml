@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.mapper.HospitalMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.pojo.Hospital">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="bedNumber" jdbcType="INTEGER" property="bedNumber" />
+    <result column="deposit" jdbcType="DOUBLE" property="deposit" />
+    <result column="introduction" jdbcType="VARCHAR" property="introduction" />
+    <result column="endStatus" jdbcType="INTEGER" property="endStatus" />
+    <result column="infoStatus" jdbcType="INTEGER" property="infoStatus" />
+    <result column="registerId" jdbcType="INTEGER" property="registerId" />
+    <result column="hospitalDate" jdbcType="DATE" property="hospitalDate" />
+    <result column="totalCost" jdbcType="INTEGER" property="totalCost" />
+    <result column="restCost" jdbcType="INTEGER" property="restCost" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, bedNumber, deposit, introduction, endStatus, infoStatus, registerId, hospitalDate, 
+    totalCost, restCost
+  </sql>
+  <select id="selectByExample" parameterType="com.kaikeba.pojo.HospitalExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from hospital
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hospital
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from hospital
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.kaikeba.pojo.HospitalExample">
+    delete from hospital
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.kaikeba.pojo.Hospital">
+    insert into hospital (id, bedNumber, deposit, 
+      introduction, endStatus, infoStatus, 
+      registerId, hospitalDate, totalCost, 
+      restCost)
+    values (#{id,jdbcType=INTEGER}, #{bedNumber,jdbcType=INTEGER}, #{deposit,jdbcType=DOUBLE}, 
+      #{introduction,jdbcType=VARCHAR}, #{endStatus,jdbcType=INTEGER}, #{infoStatus,jdbcType=INTEGER}, 
+      #{registerId,jdbcType=INTEGER}, #{hospitalDate,jdbcType=DATE}, #{totalCost,jdbcType=INTEGER}, 
+      #{restCost,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kaikeba.pojo.Hospital">
+    insert into hospital
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="bedNumber != null">
+        bedNumber,
+      </if>
+      <if test="deposit != null">
+        deposit,
+      </if>
+      <if test="introduction != null">
+        introduction,
+      </if>
+      <if test="endStatus != null">
+        endStatus,
+      </if>
+      <if test="infoStatus != null">
+        infoStatus,
+      </if>
+      <if test="registerId != null">
+        registerId,
+      </if>
+      <if test="hospitalDate != null">
+        hospitalDate,
+      </if>
+      <if test="totalCost != null">
+        totalCost,
+      </if>
+      <if test="restCost != null">
+        restCost,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="bedNumber != null">
+        #{bedNumber,jdbcType=INTEGER},
+      </if>
+      <if test="deposit != null">
+        #{deposit,jdbcType=DOUBLE},
+      </if>
+      <if test="introduction != null">
+        #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="endStatus != null">
+        #{endStatus,jdbcType=INTEGER},
+      </if>
+      <if test="infoStatus != null">
+        #{infoStatus,jdbcType=INTEGER},
+      </if>
+      <if test="registerId != null">
+        #{registerId,jdbcType=INTEGER},
+      </if>
+      <if test="hospitalDate != null">
+        #{hospitalDate,jdbcType=DATE},
+      </if>
+      <if test="totalCost != null">
+        #{totalCost,jdbcType=INTEGER},
+      </if>
+      <if test="restCost != null">
+        #{restCost,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.kaikeba.pojo.HospitalExample" resultType="java.lang.Long">
+    select count(*) from hospital
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update hospital
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.bedNumber != null">
+        bedNumber = #{record.bedNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.deposit != null">
+        deposit = #{record.deposit,jdbcType=DOUBLE},
+      </if>
+      <if test="record.introduction != null">
+        introduction = #{record.introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="record.endStatus != null">
+        endStatus = #{record.endStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.infoStatus != null">
+        infoStatus = #{record.infoStatus,jdbcType=INTEGER},
+      </if>
+      <if test="record.registerId != null">
+        registerId = #{record.registerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.hospitalDate != null">
+        hospitalDate = #{record.hospitalDate,jdbcType=DATE},
+      </if>
+      <if test="record.totalCost != null">
+        totalCost = #{record.totalCost,jdbcType=INTEGER},
+      </if>
+      <if test="record.restCost != null">
+        restCost = #{record.restCost,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update hospital
+    set id = #{record.id,jdbcType=INTEGER},
+      bedNumber = #{record.bedNumber,jdbcType=INTEGER},
+      deposit = #{record.deposit,jdbcType=DOUBLE},
+      introduction = #{record.introduction,jdbcType=VARCHAR},
+      endStatus = #{record.endStatus,jdbcType=INTEGER},
+      infoStatus = #{record.infoStatus,jdbcType=INTEGER},
+      registerId = #{record.registerId,jdbcType=INTEGER},
+      hospitalDate = #{record.hospitalDate,jdbcType=DATE},
+      totalCost = #{record.totalCost,jdbcType=INTEGER},
+      restCost = #{record.restCost,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.pojo.Hospital">
+    update hospital
+    <set>
+      <if test="bedNumber != null">
+        bedNumber = #{bedNumber,jdbcType=INTEGER},
+      </if>
+      <if test="deposit != null">
+        deposit = #{deposit,jdbcType=DOUBLE},
+      </if>
+      <if test="introduction != null">
+        introduction = #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="endStatus != null">
+        endStatus = #{endStatus,jdbcType=INTEGER},
+      </if>
+      <if test="infoStatus != null">
+        infoStatus = #{infoStatus,jdbcType=INTEGER},
+      </if>
+      <if test="registerId != null">
+        registerId = #{registerId,jdbcType=INTEGER},
+      </if>
+      <if test="hospitalDate != null">
+        hospitalDate = #{hospitalDate,jdbcType=DATE},
+      </if>
+      <if test="totalCost != null">
+        totalCost = #{totalCost,jdbcType=INTEGER},
+      </if>
+      <if test="restCost != null">
+        restCost = #{restCost,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.pojo.Hospital">
+    update hospital
+    set bedNumber = #{bedNumber,jdbcType=INTEGER},
+      deposit = #{deposit,jdbcType=DOUBLE},
+      introduction = #{introduction,jdbcType=VARCHAR},
+      endStatus = #{endStatus,jdbcType=INTEGER},
+      infoStatus = #{infoStatus,jdbcType=INTEGER},
+      registerId = #{registerId,jdbcType=INTEGER},
+      hospitalDate = #{hospitalDate,jdbcType=DATE},
+      totalCost = #{totalCost,jdbcType=INTEGER},
+      restCost = #{restCost,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

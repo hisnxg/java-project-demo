@@ -1,0 +1,31 @@
+server:
+  port: 9006
+spring:
+  application:
+    name: cloud-config
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/mynxg/my-order-config.git
+          search-paths: configBill
+          default-label: master
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:8088/eureka
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bus-refresh
+  endpoint:
+    bus-refresh:
+      enabled: true
+
+

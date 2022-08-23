@@ -1,0 +1,38 @@
+server:
+  port: 9005
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+#        - id: service1
+#          uri: https://blog.csdn.net
+#          predicates:
+#            - Path=/csdn
+#        - id: service2
+#          #uri:http://127.0.0.1:9001
+#          uri: lb://cloud-payment-service
+#          predicates: #断言
+#            - Path=/payment/** # **指任意子路径 ，方式1
+#           # - Path=/payment/{segment} #片段语法，方式2
+#        - id: service3
+#          uri: https://baidu.com
+#          predicates:
+#            - Query=smile
+#        - id: service4
+#          uri: https://baidu.com
+#          predicates:
+#            - Query=keep,pu.
+#        - id: service5
+#          uri: https://baidu.com
+#          predicates:
+#            - Header=X-Request-Id,\d+ #\d+指数字类型
+        - id: service6
+          uri: https://baidu.com
+          predicates:
+            - Cookie=sessionId,test
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:9004/eureka

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>收费项目管理</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+
+        .sidebar-nav {
+            padding: 90px;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#newNav').click(function () {
+                window.location.href = "charge-edit1.html";
+            });
+            //初始化数据
+            initData("");
+        });
+
+        function initData(chapName) {
+            console.log("aaaaaaa");
+            $.ajax({
+                url: "selectChargeproject",
+                data: {'chapName': chapName},
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    console.log("cccccc");
+                    //清空下级标签
+                    $("#xunhuan").empty();
+                    let page = data.data.chargeprojectPage;
+                    let param = data.data.param;
+                    let list = page.list;
+                    //遍历数据
+                    $.each(list, function (index, chargeproject) {
+                        $("#xunhuan").append(
+                            "<tr >\n" +
+                            "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"1\"></td>\n" +
+                            "    <td style=\"vertical-align:middle;\">" + chargeproject.chapId + "</td>\n" +
+                            "    <td style=\"vertical-align:middle;\">" + chargeproject.chapName + "</td>\n" +
+                            "    <td style=\"vertical-align:middle;\">" + chargeproject.chapMoney + "</td>\n" +
+                            "    <td style=\"vertical-align:middle;\">" + formDate(chargeproject.chapStime) + "</td>\n" +
+                            "    <td style=\"vertical-align:middle;\"><a href=\"charge-edit1.html?chapId=" + chargeproject.chapId + "_1\">详情>>></a>&nbsp;&nbsp;&nbsp;<a href=\"charge-edit1.html?chapId=" + chargeproject.chapId + "_2\">更改</a>&nbsp;&nbsp;&nbsp;<a  onclick='shanchu(" + chargeproject.chapId + ")' href=\"#\">删除</a></td>\n" +
+                            "</tr>")
+                        //查询参数回显
+                        $("#chapName").val(param.chapName);
+                        console.log(param.chapName);
+                        //分页
+                        // $("#pageNum").text(page.pageNum + "/" + page.pages);
+                        // $("#totalMsg").text(page.pages);
+
+
+                        new Pagination({
+                            element: '#pages',
+                            type: 2,
+                            layout: 'prev, pager, next, total, jumper',
+                            pageIndex: 1,
+                            pageSize: 5,
+                            pageCount: 9,
+                            total: page.total,
+                            singlePageHide: false,
+                            disabled: true,
+                            currentChange: function (index) {
+                                console.log(index);
+
+                                let chapName = $("#chapName").val();
+                                $.ajax({
+                                    url: "selectChargeproject",
+                                    data: {'chapName': chapName,'pageNum':index},
+                                    type: 'post',
+                                    dataType: 'json',
+                                    success: function (data) {
+                                        console.log("cccccc");
+                                        //清空下级标签
+                                        $("#xunhuan").empty();
+                                        let page = data.data.chargeprojectPage;
+                                        let param = data.data.param;
+                                        let list = page.list;
+                                        //遍历数据
+                                        $.each(list, function (index, chargeproject) {
+                                            $("#xunhuan").append(
+                                                "<tr >\n" +
+                                                "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"1\"></td>\n" +
+                                                "    <td style=\"vertical-align:middle;\">" + chargeproject.chapId + "</td>\n" +
+                                                "    <td style=\"vertical-align:middle;\">" + chargeproject.chapName + "</td>\n" +
+                                                "    <td style=\"vertical-align:middle;\">" + chargeproject.chapMoney + "</td>\n" +
+                                                "    <td style=\"vertical-align:middle;\">" + formDate(chargeproject.chapStime) + "</td>\n" +
+                                                "    <td style=\"vertical-align:middle;\"><a href=\"charge-edit1.html?chapId=" + chargeproject.chapId + "_1\">详情>>></a>&nbsp;&nbsp;&nbsp;<a href=\"charge-edit1.html?chapId=" + chargeproject.chapId + "_2\">更改</a>&nbsp;&nbsp;&nbsp;<a  onclick='shanchu(" + chargeproject.chapId + ")' href=\"#\">删除</a></td>\n" +
+                                                "</tr>")
+                                        });
+                                    }
+                                });
+                            }
+                        });
+
+                    });
+                }
+            });
+        }
+
+        function queryChargeproject() {
+            let chapName = $("#chapName").val();
+            initData(chapName);
+        }
+
+        function formDate(toDate) {
+            var date = new Date(toDate);
+            var year = date.getFullYear(); //获取当前年份
+            var mon = date.getMonth() + 1; //获取当前月份
+            var da = date.getDate(); //获取当前日
+            var day = date.getDay(); //获取当前星期几
+            var h = date.getHours(); //获取小时
+            var m = date.getMinutes(); //获取分钟
+            var s = date.getSeconds(); //获取秒
+            var d = document.getElementById('Date');
+            return year + '-' + mon + '-' + da;
+        }
+
+        function checkall() {
+            var alls = document.getElementsByName("check");
+            var ch = document.getElementById("checkall");
+            if (ch.checked) {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = true;
+                }
+            } else {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = false;
+                }
+            }
+        }
+
+        function delAll() {
+            var alls = document.getElementsByName("check");
+            var ids = new Array();
+            for (var i = 0; i < alls.length; i++) {
+                if (alls[i].checked) {
+                    ids.push(alls[i].value);
+                }
+            }
+            if (ids.length > 0) {
+                if (confirm("确认操作?")) {
+                    alert("成功!");
+                }
+            } else {
+                alert("请选中要操作的项");
+            }
+        }
+    </script>
+</head>
+<body>
+
+<form action="#" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <input type="hidden" id="id" name="id">
+            <td width="10%" class="tableleft">收费项目名称：</td>
+            <td width="10%"><input id="chapName" type="text" name="chapName"/></td>
+
+            <td>
+                <button class="btn btn-primary" type="button" onclick="queryChargeproject()">查询</button>
+                <button type="submit" class="btn btn-primary" type="button">清空</button>
+            </td>
+        </tr>
+
+    </table>
+
+
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>编号</th>
+        <th>收费项目名称</th>
+        <th>收费金额</th>
+        <th>创建日期</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="xunhuan">
+    <tr>
+        <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+        <td style="vertical-align:middle;">1103</td>
+        <td style="vertical-align:middle;">心脏检查</td>
+        <td style="vertical-align:middle;">200</td>
+        <td style="vertical-align:middle;">2015-01-04 10:34</td>
+        <td style="vertical-align:middle;">
+            <a href="charge-edit1.html">修改</a>
+            <a href="charge.html">删除</a>
+            <a href="charge-edit1.html">查看详情</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="pages">
+<!--                <a href='#'>第一页</a> <a href='#'>上一页</a> <span class='current'>1</span><a href='#'>2</a><a-->
+<!--                    href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a> <a href='#'>下一页</a>-->
+<!--                <a href='#'>最后一页</a>-->
+<!--                &nbsp;&nbsp;&nbsp;共<span class='current'>32</span>条记录<span class='current'> 1/33 </span>页-->
+            </div>
+            <div>
+                <button type="button" class="btn btn-success" id="newNav">添加收费项目</button>
+
+            </div>
+
+        </th>
+    </tr>
+</table>
+
+</body>
+<script>
+    //删除
+    function shanchu(id){
+        $.ajax({
+            url: "deleteById",
+            data: {'chapId': id},
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                if (data.response.flag){
+                    //重新加载数据
+                    initData("");
+                }else {
+                    alert("删除失败，请重试")
+                }
+            }
+        });
+
+        //取消默认行为
+        return false;
+    }
+</script>
+</html>

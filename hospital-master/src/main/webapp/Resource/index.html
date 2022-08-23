@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/style.css" />
+    <script type="text/javascript" src="../../Js/jquery.js"></script>
+    <script type="text/javascript" src="../../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../Js/ckform.js"></script>
+    <script type="text/javascript" src="../../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        a:link {
+            font-size: 12px;
+            text-decoration: none;
+        }
+        a:visited {
+            font-size: 12px;
+            text-decoration: none;
+        }
+        a:hover {
+            font-size: 12px;
+            text-decoration: underline;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<form class="form-inline definewidth m20" id="myForm">
+    资源(菜单)名称：
+    <input type="text" name="menuName" id="menuName"class="abc input-default" placeholder="" value="">&nbsp;&nbsp;
+    页号
+    <input  type="text" class="abc input-default"  placeholder="" name="pageNum" value="1" /> &nbsp;
+    单页条数：
+    <select class="form-control" name="pageSize">
+        <option value="5" selected="selected">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+    </select> &nbsp;
+    <button type="button" class="btn btn-primary" onclick="loadData()">查询</button>
+</form>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th width="5%"><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>资源名称</th>
+        <th>路径Url</th>
+        <th>是否有效</th>
+        <th  width="10%">操作</th>
+    </tr>
+    </thead>
+
+    <tbody id="tbody"></tbody>
+
+</table>
+
+<table class="table table-bordered table-hover definewidth m10" >
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="ppp">
+                <span id="total"></span> 条记录
+                <span id="pageNum">1</span> /<span id="pages">1</span>页
+                <div name="pageDiv">
+                    <span name="pageSpan" id="firstPage"><a href="javascript:void(0)">首页</a></span>
+                    <span name="pageSpan" id="prePage"><a href="javascript:void(0)">上一页</a></span>
+                    <span id="first_point">...</span>
+                    <span name="pageSpan" id="page1"><a href='javascript:void(0)'>1</a></span>
+                    <span name="pageSpan" id="page2"><a href='javascript:void(0)'>2</a></span>
+                    <span name="pageSpan" id="page3"><a href='javascript:void(0)'>3</a></span>
+                    <span name="pageSpan" id="page4"><a href='javascript:void(0)'>4</a></span>
+                    <span name="pageSpan" id="page5"><a href='javascript:void(0)'>5</a></span>
+                    <span id="last_point">...</span>
+                    <span name="pageSpan" id="nextPage"><a href="javascript:void(0)">下一页</a></span>
+                    <span name="pageSpan" id="lastPage"><a href="javascript:void(0)">末页</a></span>
+                </div>
+            </div>
+            <div><button type="button" class="btn btn-success" id="newNav" onclick="addMenu()">添加资源</button>&nbsp;&nbsp;&nbsp;
+                <button type="button" class="btn btn-success" id="delPro" onClick="delAll();">删除选中</button>
+            </div>
+
+        </th>
+    </tr>
+</table>
+
+<script>
+    //页面加载完毕之后发送异步请求
+    $(function(){
+        loadData();
+        $('div[name="pageDiv"]>span').click(function(){
+            if(($(this).attr("class"))=='disabled'){
+                return;
+            }
+            let num=$(this).attr("name");
+            $("input[name='pageNum']").val(num);
+            loadData();
+        });
+
+    });
+    //填充分页信息
+    function fillPageData(pageInfo) {
+        if($("input[name='pageNum']").val() > pageInfo.pages){
+            $("input[name='pageNum']").val(pageInfo.pages);
+        }
+
+        if(pageInfo.pages <= 5){
+            $("#first_point").hide();
+            $("#last_point").hide();
+            for(let i = 1; i <= 5; i++){
+                $("#page" + i + ">a").attr("class", "");
+                $("#page" + i).hide();
+            }
+            for(let i = 1; i <= pageInfo.pages; i++){
+                let page = $("#page" + i);
+                page.show();
+                page.attr("name",i);
+                $("#page" + i + ">a").html(i);
+            }
+            $("#page" + pageInfo.pageNum + ">a").addClass("current");
+        }
+        else{
+            for(let i = 1; i <= 5; i++){
+                $("#page" + i).show();
+            }
+            if(pageInfo.pageNum < 4){
+                $("#first_point").hide();
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(i);
+                    $("#page" + i).attr("name", i);
+                }
+                $("#page" + pageInfo.pageNum + ">a").addClass("current");
+            }
+            else if(pageInfo.pageNum > pageInfo.pages - 3){
+                $("#last_point").hide();
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(pageInfo.pages + i - 5);
+                    $("#page" + i).attr("name", pageInfo.pages + i - 5);
+
+                }
+                $("#page" + (pageInfo.pageNum - pageInfo.pages + 5) + ">a").addClass("current");
+            }
+            else {
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(pageInfo.pageNum + i - 3);
+                    $("#page" + i).attr("name", pageInfo.pageNum + i - 3);
+                }
+                $("#page3>a").addClass("current");
+            }
+            if(pageInfo.pageNum > 3){
+                $("#first_point").show();
+            }
+            if(pageInfo.pageNum < pageInfo.pages - 2){
+                $("#last_point").show();
+            }
+        }
+
+        //填充信息
+        $("#total").html(pageInfo.total);
+        $("#pages").html(pageInfo.pages);
+        $("#pageNum").html(pageInfo.pageNum);
+        $("select[name='pageSize']").val(pageInfo.pageSize);
+        $("input[name='pageNum']").val(pageInfo.pageNum);
+        //设置按钮的属性值和样式
+        $("#firstPage").attr("name",1);
+        $("#prePage").attr("name",pageInfo.prePage);
+        $("#nextPage").attr("name",pageInfo.nextPage);
+        $("#lastPage").attr("name",pageInfo.pages);
+        $("#firstPage").removeClass("disabled");
+        $("#prePage").removeClass("disabled");
+        $("#nextPage").removeClass("disabled");
+        $("#lastPage").removeClass("disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#firstPage").addClass("disabled");
+            $("#prePage").addClass("disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#nextPage").addClass("disabled");
+            $("#lastPage").addClass("disabled");
+        }
+    }
+
+
+    //添加菜单
+    function addMenu(){
+        window.location.href="add.html";
+    }
+
+    //更新按钮
+    function updateMenu(id) {
+        let pageNum=$("input[name='pageNum']").val();
+        let pageSize=$("select[name='pageSize']").val();
+        //let query=$("input[name='menuName']").val();
+        window.location.href="/Resource/edit.html?menuId="+id+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+
+    //删除按钮
+    function delMenu(id) {
+        if(confirm("确定要删除吗?")) {
+            //发起异步请求
+            $.ajax({
+                type: "POST",
+                url: "/menu/" + id, //RESTful风格的API定义
+                data: "_method=DELETE",
+                success: function (vo) {
+                    if(vo.code==200){
+                        loadData();
+                    }else{
+                        alert("删除失败！"+vo.msg);
+                    }
+                }
+            });
+        }
+    }
+
+    //全选
+    function checkall(){
+        var alls=document.getElementsByName("check");
+        var ch=document.getElementById("checkall");
+        if(ch.checked){
+            for(var i=0;i<alls.length;i++){
+                alls[i].checked=true;
+            }
+        }else{
+            for(var i=0;i<alls.length;i++){
+                alls[i].checked=false;
+            }
+        }
+    }
+
+    //删除所有选中
+    function delAll(){
+        let alls = document.getElementsByName("check");//获取所有复选框
+        let menuIds = [];
+        for(let i = 0; i < alls.length; i++){
+            if(alls[i].checked){   //将所有选中的复选框的value值(userId)存入list传入后台
+                menuIds.push(alls[i].value);
+            }
+        }
+        if(menuIds.length>0){
+            if(confirm("确认删除?")){
+                console.log("待删除的menuId："+menuIds);
+                $.ajax({
+                    type: "POST",
+                    url: "/menu/all", //RESTful风格的API定义
+                    data: "menuIds=" + menuIds + "&_method=DELETE",
+                    dataType: "json",
+                    traditional:true,
+                    success: function (vo) {
+                        if(vo.code === 200){
+                            alert("删除成功!");
+                            loadData();
+                        }else{
+                            alert("删除失败！"+vo.msg);
+                        }
+                    }
+                });
+            }
+        }else{
+            alert("请选中要删除的项");
+        }
+    }
+
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+
+
+    //加载数据
+    function loadData(){
+        let url = document.location.toString();
+        let pageNum=url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+        //let query = url.GetValue("query");
+        if(pageNum!=null&&$("input[name='pageNum']").val()!=null){
+            $("input[name='pageNum']").val(pageNum);
+        }
+        if(pageSize!=null&&$("select[name='pageSize']").val()!=null){
+            $("select[name='pageSize']").val(pageSize);
+        }
+       /* if(query != null && query !== "" && $("input[name='menuName']").val() != null){
+            $("input[name='menuName']").val(query);
+        }*/
+        //alert($("#myForm").serialize())
+        $.ajax({
+            type: "GET",
+            url: "/menu/list",
+            data: $("#myForm").serialize(),//主要是分页和多条件参数数据
+            dataType:"json",
+            success: function(vo){
+                //alert( "Data Saved: " + vo );
+                let list=vo.pageInfo.list;
+                let str="";
+                for(let i=0;i<list.length;i++){
+                    let obj=list[i];
+                    let id=obj.id;
+                    let menuName=obj.menuName==null?'':obj.menuName;
+                    let url=obj.url==null?'':obj.url;
+                    let status=obj.status==0?'有效':'无效';
+                    //let is_del=obj.is_del;
+                    let btnStr="";
+                    /*if(is_del==0){
+                        btnStr='<a onclick="updateMenu('+m_id+')">编辑</a>&nbsp;'+'<a onclick="delMenu('+m_id+')">删除</a>'  ;
+                    }else{
+                        btnStr='<a href="#">已删除</a>';
+                    }*/
+
+                    if(obj.status==0){
+                        btnStr='<button onclick="updateMenu('+id+')">编辑</button>&nbsp;'+'<button onclick="delMenu('+id+')">删除</button>'  ;
+                    }else{
+                        btnStr='<button href="#">已删</button>' + '<button onclick="updateMenu('+id+')">编辑</button>&nbsp;' ;
+                    }
+                    str+='<tr >' +
+                        '            <td style="vertical-align:middle;"><input type="checkbox" name="check" value="'+id+'"/></td>' +
+                        '            <td>'+menuName+'</td>' +
+                        '            <td>'+url+'</td>' +
+                        '            <td>'+status+'</td>' +
+                        '            <td>'+btnStr+'</td>' +
+                        '</tr>'
+                }
+                $("#tbody").html(str);
+                //填充分页数据
+                fillPageData(vo.pageInfo);
+            }
+        });
+    }
+</script>
+</body>
+</html>

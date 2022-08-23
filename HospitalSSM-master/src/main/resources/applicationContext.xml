@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/mvc
+                           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+">
+    <!--applicationContext.xml配置的八件事-->
+    <!--配置数据源-->
+    <bean id="db" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/hospital?useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="123456"></property>
+    </bean>
+    <!--创建SqlSessionFactory-->
+    <bean id="fac" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="db"></property>
+        <!--指定mybatis的配置文件路径-->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!--指定mapper位置，在mapper文件夹下-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+    </bean>
+    <!--二选一即可-->
+    <!--1.实例化Dao层，创建SqlSessionTemplate，没有无参构造-->
+    <!--<bean class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="fac"></constructor-arg>
+    </bean>-->
+    <!--2.不用实例化Dao层，创建MapperScannerConfigurer，可省略实现类-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="fac"></property>
+        <!--接口所在的包路径-->
+        <property name="basePackage" value="com.kkb.dao"></property>
+    </bean>
+    <!--配置事务-->
+    <bean id="mytx" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="db"></property>
+    </bean>
+    <tx:annotation-driven transaction-manager="mytx"></tx:annotation-driven>
+    <!--启用mvc注解-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+    <!--配置视图解析器-->
+    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/"></property>
+        <property name="suffix" value=".html"></property>
+    </bean>-->
+    <!--扫描注解包-->
+    <context:component-scan base-package="com.kkb"></context:component-scan>
+    <!--配置静态资源访问-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--拦截器-->
+    <mvc:interceptors>
+        <bean class="com.kkb.interceptor.LoginInterceptor"/>
+    </mvc:interceptors>
+
+</beans>

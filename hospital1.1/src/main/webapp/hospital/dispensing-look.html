@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>发药详情--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#backid').click(function(){
+                window.location.href="dispensing.html";
+            });
+        });
+    </script>
+</head>
+<body>
+
+<form id="myForm" action="dispensing.html" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td>
+                页号
+                <input  type="text" class="abc input-default"  placeholder="" name="pageNum" value="1" /> &nbsp;
+                单页条数：
+                <select class="form-control" name="pageSize">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                </select>
+                <button id="find" class="btn btn-primary" type="button">查询</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+    <tr>
+        <th>病历号</th>
+        <th>姓名</th>
+        <th>药品名称</th>
+        <th>药品数量</th>
+        <th>已发数量</th>
+        <th>未发数量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+    <tr >
+        <td style="vertical-align:middle;">1103</td>
+        <td style="vertical-align:middle;">黄飞鸿</td>
+        <td style="vertical-align:middle;">3402-九九感冒灵</td>
+        <td style="vertical-align:middle;">3</td>
+        <td style="vertical-align:middle;">2</td>
+        <td style="vertical-align:middle;">1</td>
+        <td style="vertical-align:middle;"><a href="#">发全</a>&nbsp;&nbsp;&nbsp;<a href="#">发1</a>&nbsp;&nbsp;&nbsp;<a href="#">发5</a>&nbsp;&nbsp;&nbsp;<a href="#">发30</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10" >
+    <tr><th colspan="5">  <div class="inline pull-right page" id="ppp">
+        <span  id="total"></span> 条记录 <span id="pageNum">1</span> /<span id="pages">1</span>页
+        <span name="page1" id="firstPage"><a href="javascript:void(0)">首页</a></span>
+        <span name="page2" id="prePage"><a href="javascript:void(0)">上一页</a></span>
+        <span name="page3" id="nextPage"><a href="javascript:void(0)">下一页</a></span>
+        <span name="page4" id="lastPage"><a href="javascript:void(0)">末页</a></span>
+    </div>
+        <div>
+            <button type="button" class="btn btn-success" id="backid">返回列表</button>
+        </div>
+    </th></tr>
+</table>
+
+<script>
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return decodeURI(r[2]); return null;
+    }
+    //页面加载完毕之后发送异步请求
+    $(function(){
+        let url = document.location.toString();//获取URL
+        let hid=url.GetValue("hid");
+        let registerName=url.GetValue("registerName");
+        loadData(hid,registerName);
+        $("#firstPage").click(function(){
+            if(($(this).attr("class"))=='disabled')
+                return;
+            let num=$(this).attr("name");
+            $("input[name='pageNum']").val(num);
+            loadData(pid);
+        });
+        $("#prePage").click(function(){
+            if(($(this).attr("class"))=='disabled')
+                return;
+            let num=$(this).attr("name");
+            $("input[name='pageNum']").val(num);
+            loadData(pid);
+        });
+        $("#nextPage").click(function(){
+            if(($(this).attr("class"))=='disabled')
+                return;
+            let num=$(this).attr("name");
+            $("input[name='pageNum']").val(num);
+            loadData(pid);
+        });
+        $("#lastPage").click(function(){
+            if(($(this).attr("class"))=='disabled')
+                return;
+            let num=$(this).attr("name");
+            $("input[name='pageNum']").val(num);
+            loadData(pid);
+        });
+        $("#find").click(function () {
+            loadData(hid,registerName);
+        });
+    });
+    //填充分页信息
+    function fillPageData(pageInfo) {
+        //填充信息
+        $("#total").html(pageInfo.total);
+        $("#pages").html(pageInfo.pages);
+        $("span[id='pageNum']").val(pageInfo.pageNum);
+        $("select[name='pageSize']").val(pageInfo.pageSize);
+        $("input[name='pageNum']").val(pageInfo.pageNum);
+        //设置按钮的属性值和样式
+        $("#firstPage").attr("name",1);
+        $("#prePage").attr("name",pageInfo.prePage);
+        $("#nextPage").attr("name",pageInfo.nextPage);
+        $("#lastPage").attr("name",pageInfo.pages);
+        $("#firstPage").removeClass("disabled");
+        $("#prePage").removeClass("disabled");
+        $("#nextPage").removeClass("disabled");
+        $("#lastPage").removeClass("disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#firstPage").addClass("disabled");
+            $("#prePage").addClass("disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#nextPage").addClass("disabled");
+            $("#lastPage").addClass("disabled");
+        }
+    }
+
+    //发放指定数量的药
+    function grant(hid,drugId,type){
+        $.ajax({
+            type: "POST",
+            url: "/dispensing/grant/"+hid,
+            data: "drugId="+drugId+"&type="+type+"&_method=PUT",
+            success: function(vo){
+                if(vo.code===200){
+                    alert("发药成功!")
+                    window.location.href="dispensing.html";
+                }else{
+                    alert("发药失败！"+vo.msg);
+                }
+            }
+        });
+    }
+
+    //加载数据
+    function loadData(hid,registerName){
+        $.ajax({
+            type: "GET",
+            url: "/dispensing/look/"+hid,
+            data: $("#myForm").serialize(),
+            //主要是分页和多条件参数数据
+            dataType:"json",
+            success: function(vo){
+                //alert( "Data Saved: " + vo );
+                let list=vo.pageInfo.list;
+                let str="";
+                for(let i=0;i<list.length;i++){
+                    let obj=list[i];
+                    let drugId = obj.drugId;
+                    let drugName=obj.drug.drugName==null?'':obj.drug.drugName;
+                    let need=obj.need==null?'0':obj.need;
+                    let own=obj.own==null?'0':obj.own;
+                    let total=need+own;
+                    let btnStr="";
+                    btnStr='<a onclick="grant('+hid+","+drugId+",1"+')">全发&nbsp;&nbsp;'+
+                        '<a onclick="grant('+hid+","+drugId+",2"+')">发1</a>&nbsp;'+
+                        '<a onclick="grant('+hid+","+drugId+",3"+')">发5</a>&nbsp;' ;
+
+                    str+='<tr >' +
+                        '            <td>'+hid+'</td>' +
+                        '            <td>'+registerName+'</td>' +
+                        '            <td>'+drugName+'</td>' +
+                        '            <td>'+total+'</td>' +
+                        '            <td>'+own+'</td>' +
+                        '            <td>'+need+'</td>' +
+                        '            <td>'+btnStr+'</td>' +
+                        '</tr>'
+                }
+                $("#tbody").html(str);
+                //填充分页数据
+                fillPageData(vo.pageInfo);
+            }
+        });
+    }
+</script>
+</body>
+</html>

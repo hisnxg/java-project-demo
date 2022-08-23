@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/style.css" />
+    <script type="text/javascript" src="../../Js/jquery.js"></script>
+   <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../Js/ckform.js"></script>
+    <script type="text/javascript" src="../../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form id="myForm" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+
+        <tr>
+            <td width="10%" class="tableleft">角色名称</td>
+            <td><input type="text" name="roleName"/><span id="roleMsg"></span></td>
+        </tr>
+        <tr>
+            <td class="tableleft">状态</td>
+            <td>
+                <input type="radio" name="status" value="0" checked/> 启用
+                <input type="radio" name="status" value="1"/> 禁用
+            </td>
+        </tr>
+        <tr>
+            <td class="tableleft">权限</td>
+            <td>
+                <div id="menu" name="menu">
+
+                </div>
+
+            </td>
+        </tr>
+        <tr>
+            <td class="tableleft"></td>
+            <td>
+                <button id="btnAdd" class="btn btn-primary" type="button">保存</button> &nbsp;&nbsp;
+                <button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+<script>
+    $(function () {
+
+        //菜单回显
+        $.ajax({
+            type: "GET",
+            url: "/menu/all",
+            data: "",
+            dataType:"json",
+            success: function(vo){
+                let list = vo.list;
+                console.log("获取到的所有菜单:"+list);
+                let str = "";
+                for(let i = 0; i < list.length; i++){
+                    let roleId = list[i].id;
+                    let menuName = list[i].menuName;
+                    str += "<ul><label class='checkbox inline'><input type='checkbox' name='group' value=" + roleId + " />" + menuName + "</label></ul> "
+                }
+                $("#menu").html(str);
+            }
+        });
+
+        //角色非空和唯一性的验证
+        $("input[name='roleName']").blur(function () {
+            isRole();
+        })
+
+
+        //添加角色
+        $('#btnAdd').click(function(){
+                let all=document.getElementsByName("group"); //获取所有复选框
+                let list=[];
+                for(let i = 0; i < all.length; i++){
+                    if(all[i].checked){  //如果被选中，获取value值 也就是menuId菜单id
+                        list.push(all[i].value);
+                    }
+                }
+                if (list.length>0){
+                    $.ajax({
+                        type: "POST",
+                        url: "/role/",
+                        data: $("#myForm").serialize(),   //$("#myForm").serialize() + "&menuIds=" + list,
+                        dataType:"json",
+                        traditional:true,
+                        success: function(vo){
+                            if(vo.code === 200) {
+                                window.location.href="index.html";
+                            }else{
+                                alert("添加失败！"+vo.msg);
+                            }
+                        }
+                    });
+                }else {
+                    alert("请给角色选择权限")
+                }
+        });
+
+		$('#backid').click(function(){
+				window.location.href="index.html";
+        });
+    });
+
+    //角色非空和唯一性的验证
+    function isRole() {
+        var roleName = $("input[name='roleName']").val();
+        if (roleName==""){
+            $("#roleMsg").html("角色不能为空");
+            $("#roleMsg").css("color","red")
+        }else {
+            $.ajax({
+                type: "GET",
+                url: "/role/roleName",
+                data: "roleName="+roleName,
+                dataType:"json",
+                success: function(vo){
+                    if(vo.code==200) {
+                        $("#roleMsg").html(vo.msg);
+                        $("#roleMsg").css("color","green")
+                    }else{
+                        $("#roleMsg").html(vo.msg);
+                        $("#roleMsg").css("color","red")
+                    }
+                }
+            });
+        }
+    }
+
+</script>

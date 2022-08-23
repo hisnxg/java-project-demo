@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加收费项目--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#backid').click(function(){
+                window.location.href="charge2.html";
+            });
+        });
+        let hosrId = window.location.href.split("?")[1].split("=")[1].split("&")[0];
+        //let hosrName = window.location.href.split("?")[1].split("=")[2];
+        let hosrName = null;
+        //页面数据初始化，自动显示病历号和姓名
+        initData(hosrId);
+        function initData(hosrId) {
+            $.ajax({
+                url:"queryCpregisterById",
+                data: {"hosrId":hosrId},
+                type: 'post',
+                dataType: 'json',
+                success: function (data){
+                    //清空下级标签
+                    $("#xunhuan").empty();
+                    let page = data.data.cpregisterPage;
+                    //let param = data.data.param;
+                    let list = page.list;
+                    //获取数据
+                    let cpregister = list[0];
+                    hosrName = cpregister.hosrName;
+                    console.log(cpregister);
+                    $("#hosrId").text(cpregister.hosrId);
+                    $("#hosrName").text(hosrName);
+                }
+            })
+        }
+
+        //输入收费项目名称，自动获取并显示金额
+        function selectChargeProject(){
+            let chapName = $("#chapName").val();
+            console.log(chapName)
+            $.ajax({
+                url: "selectChargeProject",
+                data:{"chapName":chapName},
+                type:'post',
+                dataType: 'json',
+                success:function (data){
+                    let chargeProject = data.data.chargeproject;
+                    if (chargeProject==null){
+                        alert("输入有误！收费项不存在");
+                        $("#chapName").val("");
+                        $("#chapMoney").val("");
+                    }else {
+                        //hosrId 全局变量，可以直接用
+                        let chapId = chargeProject.chapId;
+                        chapName =  chargeProject.chapName; //从data中获取收费项目名称比较好
+                        let chapMoney = chargeProject.chapMoney //从后端数据data中获得chargeProject的金额
+                        //hosrName 全局变量，直接使用
+
+                        //回显收费项目名称和金额
+                        $("#chapName").val(chapName);
+                        $("#chapMoney").val(chapMoney);
+
+                        //添加数据
+                        $('#addNewCP').click(function(){
+                            $.ajax({
+                                url:"addNewCP",
+                                data:{"hosrId":hosrId,"chapId":chapId,"chapName":chapName,"chapMoney":chapMoney,"hosrName":hosrName},
+                                type:"post",
+                                dataType:"json",
+                                success:function (data){
+                                    let addFlag = data.data.addFlag;
+                                    if (addFlag==0){
+                                        alert("添加失败！")
+                                        $("#chapName").val("");
+                                        $("#chapMoney").val("");
+                                    }else {
+                                        alert("添加成功！")
+                                        $("#chapName").val("");
+                                        $("#chapMoney").val("");
+                                    }
+                                }
+                            })
+                        });
+
+                    }
+
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<form action="charge2.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td id="hosrId">1103</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td id="hosrName">黄飞鸿</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">收费项目</td>
+        <td id="tips" ><input id="chapName" onblur="selectChargeProject()" type="text" name="pname" value=""/>输入自动匹配出来</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">收费金额</td>
+        <td><input id="chapMoney" type="text" name="pname" value=""/></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button id="addNewCP" class="btn btn-primary" type="button">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

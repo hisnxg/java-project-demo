@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>修改住院信息--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+
+        let hosrId = window.location.href.split("?")[1].split("=")[1];
+
+        //发送ajax请求
+        $.ajax({
+            url: "selectBeHospitalStateById",
+            data: {'hosrId':hosrId,},
+            type: 'GET',
+            dataType: 'json',
+            success:function (data){
+                if (data.response.flag){
+                    let rig = data.data.totalMsg;
+                    $("#hosrSelfprice").text(ziFei(rig.hosrSelfprice));
+                    $("#hosrSex").text(sexfo(rig.hosrSex));
+                    $("#hosrLookdoctor").text(zhenduan(rig.hosrLookdoctor));
+                    $("#hosrName").text(rig.hosrName);
+                    $("#hosrMedical").text(rig.hosrMedical);
+                    $("#hosrPhone").text(rig.hosrPhone);
+                    $("#hosrAge").text(rig.hosrAge);
+
+                    let hosrIdcar = $("#hosrIdcar").text(rig.hosrIdcar);
+                    let hosrId = $("#hosrId").text(rig.hosrId);
+                    let behAntecedent = $("#behAntecedent").text(rig.behAntecedent);
+                    let behIllness = $("#behIllness").text(rig.behIllness);
+                    let hosrWork = $("#hosrWork").text(rig.hosrWork);
+
+
+                    $("#keShi").text(rig.keShi);
+                    $("#doctorName").text(rig.doctorName);
+                    $("#behNursepeople").val(rig.behNursepeople);
+                    $("#behPatbed").val(rig.behPatbed);
+                    $("#hosrRemark").val(rig.hosrRemark);
+                    //获取身份证号
+                    //changeIdCar(doctor.dIdcar)
+                }
+            }
+        })
+    });
+
+    function formDate(toDate){
+        var date= new Date(toDate);
+        var year=date.getFullYear(); //获取当前年份
+        var mon=date.getMonth()+1; //获取当前月份
+        var da=date.getDate(); //获取当前日
+        var day=date.getDay(); //获取当前星期几
+        var h=date.getHours(); //获取小时
+        var m=date.getMinutes(); //获取分钟
+        var s=date.getSeconds(); //获取秒
+        var d=document.getElementById('Date');
+        return year+'-'+mon+'-'+da;
+    }
+    function sexfo(sex){
+        if (sex==1){
+            return "男";
+        }else {
+            return "女";
+        }
+    }
+    function formDate(toDate){
+        var date= new Date(toDate);
+        var year=date.getFullYear(); //获取当前年份
+        var mon=date.getMonth()+1; //获取当前月份
+        var da=date.getDate(); //获取当前日
+        var day=date.getDay(); //获取当前星期几
+        var h=date.getHours(); //获取小时
+        var m=date.getMinutes(); //获取分钟
+        var s=date.getSeconds(); //获取秒
+        var d=document.getElementById('Date');
+        return year+'-'+mon+'-'+da;
+    }
+
+    function ziFei(num){
+        if (num==1){
+            return "免费";
+        }
+        if (num==0){
+            return "自费";
+        }
+    }
+
+    function zhenduan(num){
+        if (num==1){
+            return "初诊";
+        }
+        if (num==0){
+            return "复诊";
+        }
+    }
+
+    //保存
+    function baocun(){
+        let hosrId = $("#hosrId").text();
+        let behNursepeople = $("input[name='behNursepeople']").val();
+        let behPatbed = $("input[name='behPatbed']").val();
+        let behIllness = $("#behIllness").val();
+
+        //参数校验
+        if (hosrId==''){
+            alert("挂号id为空");
+            return;
+        }
+        if (behNursepeople==''){
+            alert("护理为空");
+            return;
+        }
+        if (behPatbed==''){
+            alert("床位号为空");
+            return;
+        }
+        if (behIllness==''){
+            alert("病情为空");
+            return;
+        }
+
+        //发送ajax请求
+        $.ajax({
+            url: "updateBeHospital",
+            data: {
+                'behId':hosrId,
+                'behNursepeople':behNursepeople,
+                'behPatbed':behPatbed,
+                'behIllness':behIllness
+            },
+            type: 'POST',
+            dataType: 'json',
+            success:function (response){
+                console.log(response.response.flag)
+                if (response.response.flag){
+                    window.location.href = "index.html";
+                }else {
+                    alert("修改失败，请重试！");
+                }
+            }
+        })
+    }
+    </script>
+</head>
+<body>
+<form action="../../index.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td id="hosrId">01</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td id="hosrName">陆小凤</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件类型</td>
+        <td>身份证</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件号</td>
+        <td id="hosrIdcar">102434586345673</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">社保号</td>
+        <td id="hosrMedical">435345435</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">联系电话</td>
+        <td id="hosrPhone">12378656789</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">是否自费</td>
+        <td id="hosrSelfprice">否</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">性别</td>
+        <td id="hosrSex">男</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">年龄</td>
+        <td id="hosrAge">33</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">职业</td>
+        <td id="hosrWork">狗仔队</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">初复诊</td>
+        <td id="hosrLookdoctor">初诊</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">所挂科室</td>
+        <td id="keShi"></td>
+<!--        <td><select id="keShi" name="keShi">-->
+<!--            <option value="急诊科">急诊科</option>-->
+<!--            <option value="骨科">骨科</option>-->
+<!--            <option value="血液科">血液科</option>-->
+<!--        </select></td>-->
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">指定医生</td>
+<!--        <td><select id="doctorName" name="doctorName">-->
+<!--            <option>程俊</option>-->
+<!--            <option>欧阳雨露</option>-->
+<!--            <option>王博</option>-->
+<!--        </select></td>-->
+        <td id="doctorName"></td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td id="hosrRemark">暂无 </td>
+	</tr>
+    <tr>
+        <td width="10%" class="tableleft">护理</td>
+        <td><input type="text" id="behNursepeople" name="behNursepeople" value="王小丫"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">床位号</td>
+        <td><input type="text" id="behPatbed" name="behPatbed" value="468"/></td>
+    </tr>
+
+    <tr>
+        <td width="10%" class="tableleft">病情</td>
+        <td><textarea id="behIllness">心律不齐，先天营养不良</textarea></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<input type="button" class="btn btn-primary" value="保存" onclick="baocun()"/></sub> &nbsp;&nbsp;
+                <input type="button" class="btn btn-success" name="backid" id="backid" value="返回列表"/>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

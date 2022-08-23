@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>入院办理--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+	 $(function () {
+		$('#newNav').click(function(){
+				window.location.href="add.html";
+		 });
+    });
+	
+    	function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;	
+				}	
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;	
+				}	
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}		
+			}
+			if(ids.length>0){
+				if(confirm("确认操作?")){
+					alert("成功!");
+				}
+			}else{
+				alert("请选中要操作的项");
+			}
+		}
+    </script>
+</head>
+<body>
+
+<form action="index.html" method="get" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病例号：</td>
+        <td><input type="text" name="hosR_id" id="hosR_id" value=""/></td>
+		
+        <td width="10%" class="tableleft">挂号姓名</td>
+        <td><input type="text" name="hosR_name" id="doctorName" value=""/></td>
+		
+        <td width="10%" class="tableleft">科室：</td>
+        <td><input type="text" name="dept" id="dept" value=""/></td>
+    </tr>
+    <tr>
+		
+        <td width="10%" class="tableleft">住院时间：</td>
+		
+		  <td colspan="5">
+			<input type="text" name="pname" value=""/>&nbsp;至&nbsp;<input type="text" name="pname" value=""/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="submit" class="btn btn-primary" id="btnList" type="button">查询</button>
+            <button type="submit" class="btn btn-primary" type="button">清空</button>
+              <script>
+                  $("#btnList").click(function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/hos/select",
+                            data: "hosR_id="+$("#hosR_id").val()+"&hosR_name="+$("#hosR_name").val()+"&dept="+$("#dept").val(),
+                            dataType:"json",
+                            success:function (vo) {
+                                console.log(vo);
+                            }
+                        })
+                  })
+              </script>
+        </td>
+    </tr>
+</table>
+</form>
+   
+<table class="table table-bordered table-hover definewidth m10" >
+   <thead>
+    <tr>
+    	<th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>病历号</th>
+        <th>姓名</th>
+        <th>床位号</th>
+        <th>联系电话</th>
+        <th>押金</th>
+        <th>主治医生</th>
+        <th>科室</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+
+  </table>
+<script>
+    $(function () {
+        loadFunction();
+    })
+    function loadFunction() {
+        $.ajax({
+            type: "GET",
+            url: "/hos/select",
+            data: null,
+            dataType:"json",
+            success: function(vo){
+                console.log(vo);
+                let str="";
+                let btnStr="";
+                let data = vo.list;
+                for (let i = 0; i <data.length ; i++) {
+                    let hosR_id=data[i].hosR_id;//病历号
+                    let hosR_name=data[i].hosR_name;//姓名
+                    let beH_patBed=data[i].behospital.beH_patBed==null?'无床位号':data[i].behospital.beH_patBed;//床位号
+                    let hosR_phone=data[i].hosR_phone;//手机号
+                    let beH_antecedent=data[i].behospital.beH_antecedent==null?'无押金':data[i].behospital.beH_antecedent;//押金
+                    let doctorName=data[i].doctor.doctorName==null?'请去前台添加医生':data[i].doctor.doctorName;//主治医生
+                    let dept=data[i].dept.deptName==null?"没有查询到该科室":data[i].dept.deptName;//科室
+                    let hosR_state=data[i].hosR_state==1?'已住院':'已挂号';//住院状态
+                    if(data[i].hosR_state== 1){
+                        btnStr='<a href="/hospital/look.html?hosR_id='+data[i].hosR_id+'">详情>></a>&nbsp;&nbsp;&nbsp;\n' +
+                            '<a href="/hospital/edit.html?hosR_id='+data[i].hosR_id+'">更改</a>&nbsp;&nbsp;&nbsp;\n' +
+                            '<a href="/hospital/add_many.html?hosR_id='+data[i].hosR_id+'">缴纳押金</a>'
+                    }else {
+                        btnStr='<a href="#">'+null+'</a>'
+                    }
+                    str+='<tr>' +
+                        '        <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>\n' +
+                        '        <td style="vertical-align:middle;">'+hosR_id+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+hosR_name+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+beH_patBed+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+hosR_phone+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+beH_antecedent+'元</td>\n' +
+                        '        <td style="vertical-align:middle;">'+doctorName+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+dept+'</td>\n' +
+                        '        <td style="vertical-align:middle;">'+hosR_state+'</td>\n' +
+                        '        <td style="vertical-align:middle;">\n' +
+                            btnStr+
+                        '        </td>\n' +
+                        '    </tr>'
+                }
+                $("#tbody").html(str);
+            }
+        });
+    }
+</script>
+  <table class="table table-bordered table-hover definewidth m10" >
+  	<tr><th colspan="5">  <div class="inline pull-right page">
+          <a href='#'  >第一页</a> <a href='#'>上一页</a>     <span class='current'>1</span><a href='#'>2</a><a href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a>  <a href='#' >下一页</a> <a href='#' >最后一页</a>
+		  &nbsp;&nbsp;&nbsp;共<span class='current'>32</span>条记录<span class='current'> 1/33 </span>页
+		  </div>
+		 <div><button type="button" class="btn btn-success" id="newNav">添加住院信息</button>&nbsp;&nbsp;&nbsp;
+		 <button type="button" class="btn btn-success" id="delPro" onClick="delAll();">出院</button>&nbsp;&nbsp;&nbsp;
+		 <button type="button" class="btn btn-success" id="delPro" onClick="delAll();">退院</button>&nbsp;&nbsp;&nbsp;
+		 <button type="button" class="btn btn-success" id="delPro">导出Excel</button>
+		 </div>
+		 
+		 </th></tr>
+  </table>
+  
+</body>
+</html>

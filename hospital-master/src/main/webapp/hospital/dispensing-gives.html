@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>发药--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="dispensing.html";
+		 });
+    });
+    </script>
+</head>
+<body>
+<form `class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td name="hid">1101,1102,1104</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td name="registerName">黄飞鸿,黄飞鸿,黄飞鸿</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td name="drug"><select name="drugs"><option>2304-九九感冒药</option></select></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">发药数量</td>
+        <td><input type="text" name="number" value=""/></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button onclick="giveDrugs()" class="btn btn-primary" type="button">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+
+<script type="text/javascript">
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return decodeURI(r[2]); return null;
+    }
+    $(function () {
+        let url = document.location.toString();
+        let hids=url.GetValue("hids");
+        let registerNames=url.GetValue("registerNames");
+        let str1 = "";
+        let str2 = "";
+        for (let i =0;i<hids.length;i++){
+            str1+= hids[i]+"";
+        }
+        for (let i =0;i<registerNames.length;i++){
+            str2+= registerNames[i]+" ";
+        }
+        $("td[name=hid]").html(str1);
+        $("td[name=registerName]").html(str2);
+        loadData();
+    });
+
+    function loadData() {
+        $.ajax({
+            type: "GET",
+            url: "/dispensing/drugs", //RESTFul风格的API定义
+            data: "",
+            success: function (vo) {
+                let list = vo.list;
+                let str = '<select name=drugs>';
+                for (let i = 0;i<list.length;i++){
+                    str+='<option value="'+list[i].id+'">'+list[i].drugName+'</option>'
+                }
+                str += '</select>';
+                $("td[name='drug']").html(str);
+            }
+        });
+    }
+
+    function giveDrugs() {
+        let hids = $("td[name=hid]").html();
+        let drugId = $("select[name='drugs']").val();
+        let number = $("input[name='number']").val();
+        let arr = hids.split(",");
+        let ids = JSON.stringify(arr);
+        console.log(ids)
+
+        $.ajax({
+            type: "POST",
+            url: "/dispensing/drugs/"+drugId, //RESTful风格的API定义
+            data: {
+                hids:ids,
+                number:number
+            },
+            dataType:"json",
+            contentType:"application/x-www-form-urlencoded;charset=UTF-8",
+            success: function (vo) {
+                if (vo.code==200){
+                    alert("添加成功");
+                }else {
+                    alert("添加失败！"+vo.msg);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

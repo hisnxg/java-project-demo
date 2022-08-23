@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.HosregisterMapper">
+  <resultMap id="BaseResultMap" type="com.kkb.bean.Hosregister">
+    <id column="hosR_id" jdbcType="INTEGER" property="hosrId" />
+    <result column="hosR_idCar" jdbcType="VARCHAR" property="hosrIdcar" />
+    <result column="hosR_medical" jdbcType="VARCHAR" property="hosrMedical" />
+    <result column="hosR_regPrice" jdbcType="DECIMAL" property="hosrRegprice" />
+    <result column="hosR_phone" jdbcType="VARCHAR" property="hosrPhone" />
+    <result column="hosR_selfPrice" jdbcType="INTEGER" property="hosrSelfprice" />
+    <result column="hosR_sex" jdbcType="INTEGER" property="hosrSex" />
+    <result column="hosR_age" jdbcType="INTEGER" property="hosrAge" />
+    <result column="hosR_work" jdbcType="VARCHAR" property="hosrWork" />
+    <result column="hosR_lookDoctor" jdbcType="INTEGER" property="hosrLookdoctor" />
+    <result column="hosR_remark" jdbcType="VARCHAR" property="hosrRemark" />
+    <result column="hosR_state" jdbcType="INTEGER" property="hosrState" />
+    <result column="hosR_name" jdbcType="VARCHAR" property="hosrName" />
+    <result column="hosR_time" jdbcType="TIMESTAMP" property="hosrTime" />
+    <association property="doctor" javaType="com.kkb.bean.Doctor">
+      <id column="d_id" jdbcType="INTEGER" property="dId" />
+      <result column="d_idCar" jdbcType="VARCHAR" property="dIdcar" />
+      <result column="d_phone" jdbcType="VARCHAR" property="dPhone" />
+      <result column="d_telPhone" jdbcType="VARCHAR" property="dTelphone" />
+      <result column="d_sex" jdbcType="INTEGER" property="dSex" />
+      <result column="d_birthday" jdbcType="DATE" property="dBirthday" />
+      <result column="d_age" jdbcType="INTEGER" property="dAge" />
+      <result column="d_email" jdbcType="VARCHAR" property="dEmail" />
+      <result column="d_keshi" jdbcType="VARCHAR" property="dKeshi" />
+      <result column="d_xueli" jdbcType="VARCHAR" property="dXueli" />
+      <result column="d_desc" jdbcType="VARCHAR" property="dDesc" />
+      <result column="d_inTime" jdbcType="DATE" property="dIntime" />
+      <result column="d_state" jdbcType="INTEGER" property="dState" />
+      <result column="d_name" jdbcType="VARCHAR" property="dName"/>
+    </association>
+  </resultMap>
+  <resultMap id="BaseResultMap1" type="com.kkb.bean.Doctor">
+    <id column="d_id" jdbcType="INTEGER" property="dId" />
+    <result column="d_idCar" jdbcType="VARCHAR" property="dIdcar" />
+    <result column="d_phone" jdbcType="VARCHAR" property="dPhone" />
+    <result column="d_telPhone" jdbcType="VARCHAR" property="dTelphone" />
+    <result column="d_sex" jdbcType="INTEGER" property="dSex" />
+    <result column="d_birthday" jdbcType="DATE" property="dBirthday" />
+    <result column="d_age" jdbcType="INTEGER" property="dAge" />
+    <result column="d_email" jdbcType="VARCHAR" property="dEmail" />
+    <result column="d_keshi" jdbcType="VARCHAR" property="dKeshi" />
+    <result column="d_xueli" jdbcType="VARCHAR" property="dXueli" />
+    <result column="d_desc" jdbcType="VARCHAR" property="dDesc" />
+    <result column="d_inTime" jdbcType="DATE" property="dIntime" />
+    <result column="d_state" jdbcType="INTEGER" property="dState" />
+    <result column="d_name" jdbcType="VARCHAR" property="dName"/>
+  </resultMap>
+
+  <resultMap id="BeHosregisterResp" type="com.kkb.vo.registration.req.BeHosregisterResp">
+    <id column="hosR_id" jdbcType="INTEGER" property="hosrId" />
+    <result column="hosR_idCar" jdbcType="VARCHAR" property="hosrIdcar" />
+    <result column="hosR_medical" jdbcType="VARCHAR" property="hosrMedical" />
+    <result column="hosR_regPrice" jdbcType="DECIMAL" property="hosrRegprice" />
+    <result column="hosR_phone" jdbcType="VARCHAR" property="hosrPhone" />
+    <result column="hosR_selfPrice" jdbcType="INTEGER" property="hosrSelfprice" />
+    <result column="hosR_sex" jdbcType="INTEGER" property="hosrSex" />
+    <result column="hosR_age" jdbcType="INTEGER" property="hosrAge" />
+    <result column="hosR_work" jdbcType="VARCHAR" property="hosrWork" />
+    <result column="hosR_lookDoctor" jdbcType="INTEGER" property="hosrLookdoctor" />
+    <result column="hosR_remark" jdbcType="VARCHAR" property="hosrRemark" />
+    <result column="hosR_state" jdbcType="INTEGER" property="hosrState" />
+    <result column="hosR_name" jdbcType="VARCHAR" property="hosrName" />
+    <result column="hosR_time" jdbcType="TIMESTAMP" property="hosrTime" />
+    <association property="doctor" javaType="com.kkb.bean.Doctor">
+      <id column="d_id" jdbcType="INTEGER" property="dId" />
+      <result column="d_idCar" jdbcType="VARCHAR" property="dIdcar" />
+      <result column="d_phone" jdbcType="VARCHAR" property="dPhone" />
+      <result column="d_telPhone" jdbcType="VARCHAR" property="dTelphone" />
+      <result column="d_sex" jdbcType="INTEGER" property="dSex" />
+      <result column="d_birthday" jdbcType="DATE" property="dBirthday" />
+      <result column="d_age" jdbcType="INTEGER" property="dAge" />
+      <result column="d_email" jdbcType="VARCHAR" property="dEmail" />
+      <result column="d_keshi" jdbcType="VARCHAR" property="dKeshi" />
+      <result column="d_xueli" jdbcType="VARCHAR" property="dXueli" />
+      <result column="d_desc" jdbcType="VARCHAR" property="dDesc" />
+      <result column="d_inTime" jdbcType="DATE" property="dIntime" />
+      <result column="d_state" jdbcType="INTEGER" property="dState" />
+      <result column="d_name" jdbcType="VARCHAR" property="dName"/>
+    </association>
+  </resultMap>
+
+  <select id="queryHosregisterByParam" resultMap="BaseResultMap">
+    SELECT
+    hosR_id, hosR_idCar, hosR_medical, hosR_regPrice, hosR_phone, hosR_selfPrice, hosR_sex,
+    hosR_age, hosR_work, hosR_lookDoctor, hosregister.d_id, hosR_remark, hosR_state,hosR_name,hosR_time,d_name,d_keshi
+    FROM
+    hosregister,
+    doctor
+    where
+    hosregister.d_id = doctor.d_id
+    <if test="hosrId!=null and hosrId!=''">
+      and hosR_id like concat('%',#{hosrId},'%')
+    </if>
+    <if test="dName!=null and dName!=''">
+      and d_name like concat('%',#{dName},'%')
+    </if>
+    <if test="startTime !=null and startTime!=''">
+      and hosR_time &gt;= #{startTime}
+    </if>
+    <if test="endTime!=null and endTime!=''">
+      and hosR_time  <![CDATA[<=]]> #{endTime}
+    </if>
+    <if test="dKeshi!=null and dKeshi!=''">
+      and d_keshi like concat('%',#{dKeshi},'%')
+    </if>
+    order by hosR_id
+  </select>
+
+  <select id="findAllKeshi" resultMap="BaseResultMap1">
+    SELECT
+      *
+    FROM
+      doctor
+    GROUP BY d_keshi
+  </select>
+
+  <select id="findByDoctorId" resultMap="BaseResultMap1">
+    SELECT
+      *
+    FROM
+      doctor
+    where d_id = #{dId,jdbcType=INTEGER}
+  </select>
+  <select id="getDoctorNameByKeshi" resultMap="BaseResultMap1">
+    SELECT
+      *
+    FROM
+      doctor
+    where
+    d_keshi = #{dKeshi,jdbcType=VARCHAR}
+  </select>
+
+  <select id="FindByHosrIdParam" resultMap="BaseResultMap">
+    SELECT
+    hosR_id, hosR_idCar, hosR_medical, hosR_regPrice, hosR_phone, hosR_selfPrice, hosR_sex,
+    hosR_age, hosR_work, hosR_lookDoctor, hosregister.d_id, hosR_remark, hosR_name,d_name,d_keshi
+    FROM
+    hosregister,
+    doctor
+    where
+    hosregister.d_id = doctor.d_id
+    and hosR_id = #{hosrId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectHosregisterIds" resultMap="BeHosregisterResp">
+    SELECT
+      hosR_id, hosR_idCar, hosR_medical, hosR_regPrice, hosR_phone, hosR_selfPrice, hosR_sex,
+      hosR_age, hosR_work, hosR_lookDoctor, hosregister.d_id, hosR_remark, hosR_name,d_name,d_keshi
+    FROM
+      hosregister,
+      doctor
+    where
+      hosregister.d_id = doctor.d_id
+      and hosR_id  in
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+         #{id}
+      </foreach>
+  </select>
+
+
+  <update id="updateRegistration" parameterType="com.kkb.vo.registration.req.UpdateRegistrationParam">
+    update hosregister
+    set
+      hosR_idCar = #{hosrIdcar,jdbcType=VARCHAR},
+      hosR_medical = #{hosrMedical,jdbcType=VARCHAR},
+      hosR_regPrice = #{hosrRegprice,jdbcType=DECIMAL},
+      hosR_phone = #{hosrPhone,jdbcType=VARCHAR},
+      hosR_selfPrice = #{hosrSelfprice,jdbcType=INTEGER},
+      hosR_sex = #{hosrSex,jdbcType=INTEGER},
+      hosR_age = #{hosrAge,jdbcType=INTEGER},
+      hosR_work = #{hosrWork,jdbcType=VARCHAR},
+      hosR_lookDoctor = #{hosrLookdoctor,jdbcType=INTEGER},
+      hosR_remark = #{hosrRemark,jdbcType=VARCHAR},
+      hosR_name = #{hosrName,jdbcType=VARCHAR}
+    where hosR_id = #{hosrId,jdbcType=INTEGER}
+  </update>
+
+  <!--何-->
+  <update id="updateById" parameterType="java.lang.Integer">
+    UPDATE hosregister set hosR_state = 3 WHERE hosR_id=#{hosrId,jdbcType=INTEGER};
+  </update>
+
+  <sql id="Base_Column_List">
+    hosR_id, hosR_idCar, hosR_medical, hosR_regPrice, hosR_phone, hosR_selfPrice, hosR_sex, 
+    hosR_age, hosR_work, hosR_lookDoctor, d_id, hosR_remark, hosR_state,hosR_name,hosR_time
+  </sql>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from hosregister
+    where hosR_id = #{hosrId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from hosregister
+    where hosR_id = #{hosrId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kkb.bean.Hosregister">
+    insert into hosregister (hosR_id, hosR_idCar, hosR_medical, 
+      hosR_regPrice, hosR_phone, hosR_selfPrice, 
+      hosR_sex, hosR_age, hosR_work, 
+      hosR_lookDoctor, d_id, hosR_remark, 
+      hosR_state,hosR_name,hosR_time)
+    values
+           (#{hosrId,jdbcType=INTEGER}, #{hosrIdcar,jdbcType=VARCHAR}, #{hosrMedical,jdbcType=VARCHAR},
+      #{hosrRegprice,jdbcType=DECIMAL}, #{hosrPhone,jdbcType=VARCHAR}, #{hosrSelfprice,jdbcType=INTEGER}, 
+      #{hosrSex,jdbcType=INTEGER}, #{hosrAge,jdbcType=INTEGER}, #{hosrWork,jdbcType=VARCHAR}, 
+      #{hosrLookdoctor,jdbcType=INTEGER}, #{dId,jdbcType=INTEGER}, #{hosrRemark,jdbcType=VARCHAR}, 
+      0, #{hosrName,jdbcType=VARCHAR},#{hosrTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kkb.bean.Hosregister">
+    insert into hosregister
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="hosrId != null">
+        hosR_id,
+      </if>
+      <if test="hosrIdcar != null">
+        hosR_idCar,
+      </if>
+      <if test="hosrMedical != null">
+        hosR_medical,
+      </if>
+      <if test="hosrRegprice != null">
+        hosR_regPrice,
+      </if>
+      <if test="hosrPhone != null">
+        hosR_phone,
+      </if>
+      <if test="hosrSelfprice != null">
+        hosR_selfPrice,
+      </if>
+      <if test="hosrSex != null">
+        hosR_sex,
+      </if>
+      <if test="hosrAge != null">
+        hosR_age,
+      </if>
+      <if test="hosrWork != null">
+        hosR_work,
+      </if>
+      <if test="hosrLookdoctor != null">
+        hosR_lookDoctor,
+      </if>
+      <if test="dId != null">
+        d_id,
+      </if>
+      <if test="hosrRemark != null">
+        hosR_remark,
+      </if>
+      <if test="hosrState != null">
+        hosR_state,
+      </if>
+      <if test="hosrName != null">
+        hosR_name,
+      </if>
+      <if test="hosrTime != null">
+        hosR_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="hosrId != null">
+        #{hosrId,jdbcType=INTEGER},
+      </if>
+      <if test="hosrIdcar != null">
+        #{hosrIdcar,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrMedical != null">
+        #{hosrMedical,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrRegprice != null">
+        #{hosrRegprice,jdbcType=DECIMAL},
+      </if>
+      <if test="hosrPhone != null">
+        #{hosrPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrSelfprice != null">
+        #{hosrSelfprice,jdbcType=INTEGER},
+      </if>
+      <if test="hosrSex != null">
+        #{hosrSex,jdbcType=INTEGER},
+      </if>
+      <if test="hosrAge != null">
+        #{hosrAge,jdbcType=INTEGER},
+      </if>
+      <if test="hosrWork != null">
+        #{hosrWork,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrLookdoctor != null">
+        #{hosrLookdoctor,jdbcType=INTEGER},
+      </if>
+      <if test="dId != null">
+        #{dId,jdbcType=INTEGER},
+      </if>
+      <if test="hosrRemark != null">
+        #{hosrRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrState != null">
+        #{hosrState,jdbcType=INTEGER},
+      </if>
+      <if test="hosrName != null">
+        #{hosrName,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrTime != null">
+        #{hosrTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.Hosregister">
+    update hosregister
+    <set>
+      <if test="hosrIdcar != null">
+        hosR_idCar = #{hosrIdcar,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrMedical != null">
+        hosR_medical = #{hosrMedical,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrRegprice != null">
+        hosR_regPrice = #{hosrRegprice,jdbcType=DECIMAL},
+      </if>
+      <if test="hosrPhone != null">
+        hosR_phone = #{hosrPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrSelfprice != null">
+        hosR_selfPrice = #{hosrSelfprice,jdbcType=INTEGER},
+      </if>
+      <if test="hosrSex != null">
+        hosR_sex = #{hosrSex,jdbcType=INTEGER},
+      </if>
+      <if test="hosrAge != null">
+        hosR_age = #{hosrAge,jdbcType=INTEGER},
+      </if>
+      <if test="hosrWork != null">
+        hosR_work = #{hosrWork,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrLookdoctor != null">
+        hosR_lookDoctor = #{hosrLookdoctor,jdbcType=INTEGER},
+      </if>
+      <if test="dId != null">
+        d_id = #{dId,jdbcType=INTEGER},
+      </if>
+      <if test="hosrRemark != null">
+        hosR_remark = #{hosrRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrState != null">
+        hosR_state = #{hosrState,jdbcType=INTEGER},
+      </if>
+      <if test="hosrId != null">
+        hosR_id = #{hosrId,jdbcType=INTEGER},
+      </if>
+      <if test="hosrName != null">
+        hosR_name = #{hosrName,jdbcType=VARCHAR},
+      </if>
+      <if test="hosrTime != null">
+        hosR_time = #{hosrTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where hosR_id = #{hosrId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kkb.bean.Hosregister">
+    update hosregister
+    set hosR_idCar = #{hosrIdcar,jdbcType=VARCHAR},
+      hosR_medical = #{hosrMedical,jdbcType=VARCHAR},
+      hosR_regPrice = #{hosrRegprice,jdbcType=DECIMAL},
+      hosR_phone = #{hosrPhone,jdbcType=VARCHAR},
+      hosR_selfPrice = #{hosrSelfprice,jdbcType=INTEGER},
+      hosR_sex = #{hosrSex,jdbcType=INTEGER},
+      hosR_age = #{hosrAge,jdbcType=INTEGER},
+      hosR_work = #{hosrWork,jdbcType=VARCHAR},
+      hosR_lookDoctor = #{hosrLookdoctor,jdbcType=INTEGER},
+      d_id = #{dId,jdbcType=INTEGER},
+      hosR_remark = #{hosrRemark,jdbcType=VARCHAR},
+      hosR_state = #{hosrState,jdbcType=INTEGER},
+      hosR_name = #{hosrName,jdbcType=VARCHAR},
+      hosR_time = #{hosrTime,jdbcType=TIMESTAMP}
+    where hosR_id = #{hosrId,jdbcType=INTEGER}
+  </update>
+<!--  <select id="selectHosregister" parameterType="java.lang.Integer" resultMap="hsp">-->
+<!--  SELECT-->
+<!--    hosregister.hosR_name,-->
+<!--    hosregister.hosR_idCar,-->
+<!--    hosregister.hosR_medical,-->
+<!--    hosregister.hosR_regPrice,-->
+<!--    hosregister.hosR_phone,-->
+<!--    hosregister.hosR_selfPrice,-->
+<!--    hosregister.hosR_sex,-->
+<!--    hosregister.hosR_age,-->
+<!--    hosregister.hosR_work,-->
+<!--    hosregister.hosR_lookDoctor,-->
+<!--    doctor.d_keshi,-->
+<!--    doctor.d_name,-->
+<!--    hosregister.hosR_remark-->
+
+<!--  FROM-->
+<!--    hosregister,-->
+<!--    doctor-->
+<!--  WHERE-->
+<!--    hosregister.d_id = doctor.d_id-->
+<!--    AND hosR_id = #{id};-->
+<!--</select>-->
+  <update id="updateHosregister" parameterType="com.kkb.bean.Hosregister">
+    UPDATE hosregister,
+      doctor
+    SET hosregister.hosR_name = #{hosrName},
+      hosregister.hosR_idCar = #{hosrIdcar},
+      hosregister.hosR_medical = #{hosrMedical},
+      hosregister.hosR_regPrice = #{hosrRegprice},
+      hosregister.hosR_phone = #{hosrPhone},
+      hosregister.hosR_selfPrice = #{hosrSelfprice},
+      hosregister.hosR_sex = #{hosrSex},
+      hosregister.hosR_age = #{hosrAge},
+      hosregister.hosR_work = #{hosrWork},
+      hosregister.hosR_lookDoctor = #{hosrLookdoctor},
+      doctor.d_keshi = #{doctor.dKeshi},
+      doctor.d_name = #{doctor.dName},
+      hosregister.hosR_remark = #{hosrRemark}
+    WHERE
+      hosregister.d_id = doctor.d_id
+      AND hosR_id = #{hosrId};
+  </update>
+</mapper>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>查看--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {
+        //获取请求中参数的值
+        String.prototype.GetValue= function(para) {
+            let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+            let r = this.substr(this.indexOf("\?")+1).match(reg);
+            if (r!=null) return unescape(r[2]); return null;
+        }
+
+        let url = document.location.toString();
+        let id=url.GetValue("id");
+        queryById(id);
+
+        //返回列表
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+    });
+
+    function queryById(id){
+        $.ajax({
+            type:"GET",
+            url: "/drug/"+id, //RESTFul风格的API定义
+            data: "",
+            dataType:"json",
+            success: function(vo){
+                let obj = vo.obj;
+                //填充详情数据
+                let id = obj.id;
+                let inPrice=obj.inPrice;
+                let outPrice=obj.outPrice;
+                let drugName=obj.drugName;
+                let description=obj.description==null?'':obj.description;
+                let quality=obj.quality;
+                let detailDescription=obj.detailDescription==null?"":obj.detailDescription;
+                let factory=obj.factory==null?"":obj.factory;
+                let instruction=obj.instruction==null?"":obj.instruction;
+                let totalNumber=obj.totalNumber;
+                let resetNumber=obj.resetNumber;
+                let note=obj.note==null?"":obj.note;
+
+                $("#id").html(id)
+                $("#inPrice").html(inPrice)
+                $("#outPrice").html(outPrice)
+                $("#drugName").html(drugName)
+                $("#description").html(description)
+                $("#quality").html(quality)
+                $("#detailDescription").html(detailDescription)
+                $("#factory").html(factory)
+                $("#instruction").html(instruction)
+                $("#totalNumber").html(totalNumber)
+                $("#resetNumber").html(resetNumber)
+                $("#note").html(note)
+
+                if(obj.img!=null){
+                    $("img[name='logo']").attr("src","/Images/"+obj.img);
+                }else{
+                    $("img[name='logo']").addClass("hidden");
+                    $("img[name='logo']").parent().html("还没有上传药品图片");
+                }
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+<form action="index.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">药品编号</td>
+        <td id="id">J6764</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">图片</td>
+        <td><img id="logo" name="logo" src="/images/uploadFile/"></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">进价</td>
+        <td id="inPrice">2元</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">售价</td>
+        <td id="outPrice">128.9元</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td id="drugName">感冒药</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">药品类型</td>
+        <td id="drugType">处方药</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">简单描述</td>
+        <td id="description">用于普通感冒</td>
+    </tr>
+
+    <tr>
+        <td width="10%" class="tableleft">保质期</td>
+        <td id="quality">2016年01月01日</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">详细描述</td>
+        <td id="detailDescription">该药仅用于普通的流行性感冒,孕妇小孩慬用……</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">生产厂商</td>
+        <td id="factory">哈药六厂生产</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">服用说明</td>
+        <td id="instruction">一次两粒一日三次</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">库存</td>
+        <td id="totalNumber">3000袋</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">剩余量</td>
+        <td id="resetNumber">1000袋</td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td id="note">暂无服用后不良记录</td>
+	</tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

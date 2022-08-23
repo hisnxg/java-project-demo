@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="mybatis-plus-demo-quickstart1" />
+        <module name="spring_boot_demo" />
+        <module name="bill-manager-tk" />
+        <module name="travel-springboot-mp" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="bill-manager-tk" target="1.8" />
+      <module name="mybatis-plus-demo-quickstart" target="1.8" />
+      <module name="mybatis-plus-demo-quickstart1" target="1.8" />
+      <module name="spring_boot_demo" target="1.8" />
+      <module name="travel-springboot-mp" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="bill-manager-tk" options="-parameters" />
+      <module name="mybatis-plus-demo-quickstart" options="-parameters" />
+      <module name="mybatis-plus-demo-quickstart1" options="-parameters" />
+      <module name="spring_boot_demo" options="-parameters" />
+      <module name="travel-springboot-mp" options="-parameters" />
+    </option>
+  </component>
+</project>

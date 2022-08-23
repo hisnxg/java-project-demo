@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.DrugpeopleMapper">
+    <resultMap id="BaseResultMap" type="com.kkb.bean.Drugpeople">
+        <id column="dr_id" jdbcType="INTEGER" property="drId"/>
+        <result column="hosR_id" jdbcType="INTEGER" property="peopleId"/>
+        <result column="peopleId" jdbcType="INTEGER" property="peopleId"/>
+        <result column="dr_number" jdbcType="INTEGER" property="drNumber"/>
+        <result column="dr_number_Issued" jdbcType="INTEGER" property="drNumberIssued"/>
+        <result column="beH_ursePeoPle" javaType="String" property="beHNursePeoPle"/>
+        <result column="hosR_name" javaType="String" property="hosrName"/>
+        <result column="d_name" javaType="String" property="dName"/>
+        <result column="dr_name" javaType="String" property="drName"/>
+        <result column="dr_number_weifa" javaType="INTEGER" property="drNumberWeifa"/>
+        <result column="hosr_id" javaType="INTEGER" property="hosrId"/>
+        <result column="dp_id" property="dpId"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        dr_id
+        , peopleId, dr_number, dr_number_Issued
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select *
+        from drugpeople
+        where peopleId = #{peopleId}
+    </select>
+
+    <select id="selectDrugPeopleById" resultMap="BaseResultMap">
+        SELECT drugpeople.peopleId,
+        hosregister.hosR_name,
+        drug.dr_name,
+        drugpeople.dr_number,
+        drugpeople.dr_number_Issued,
+        drugpeople.dr_number_weifa,
+        drugpeople.dr_id
+        FROM drugpeople,
+        hosregister,
+        drug
+        WHERE drug.dr_id = drugpeople.dr_id
+        AND drugpeople.peopleId = hosregister.hosR_id
+        <if test="peopleId != null and peopleId != ''">
+            AND drugpeople.peopleId = #{peopleId}
+        </if>
+    </select>
+
+
+    <!--    模糊查询-->
+    <select id="selectDrugPeopleByParam" resultMap="BaseResultMap">
+        SELECT
+        hosregister.hosR_name,
+        hosR_id,
+        d_name
+        FROM
+        hosregister
+        LEFT JOIN doctor ON ( hosregister.d_id = doctor.d_id )
+        WHERE
+        hosR_state in (0,1)
+        <if test="peopleId != null and peopleId != ''">
+            AND hosR_id like concat('%',#{peopleId},'%')
+        </if>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from drugpeople
+        where dr_id = #{drId,jdbcType=INTEGER}
+    </delete>
+
+
+    <insert id="insert" parameterType="com.kkb.bean.Drugpeople">
+        insert into drugpeople (dr_id, peopleId, dr_number,
+                                dr_number_Issued)
+        values (#{drId,jdbcType=INTEGER}, #{peopleid,jdbcType=INTEGER}, #{drNumber,jdbcType=INTEGER},
+                #{drNumberIssued,jdbcType=INTEGER})
+    </insert>
+
+
+    <insert id="insertSelective" parameterType="com.kkb.bean.Drugpeople">
+        insert into drugpeople
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="drId != null">
+                dr_id,
+            </if>
+            <if test="peopleId != null">
+                peopleId,
+            </if>
+            <if test="drNumber != null">
+                dr_number,
+            </if>
+            <if test="drNumberIssued != null">
+                dr_number_Issued,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="drId != null">
+                #{drId,jdbcType=INTEGER},
+            </if>
+            <if test="peopleId != null">
+                #{peopleId,jdbcType=INTEGER},
+            </if>
+            <if test="drNumber != null">
+                #{drNumber,jdbcType=INTEGER},
+            </if>
+            <if test="drNumberIssued != null">
+                #{drNumberIssued,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.Drugpeople">
+        update drugpeople
+        <set>
+
+            <if test="drNumber != null">
+                dr_number = #{drNumber,jdbcType=INTEGER},
+            </if>
+            <if test="drNumberIssued != null">
+                dr_number_Issued = #{drNumberIssued,jdbcType=INTEGER},
+            </if>
+            <if test="drNumberWeifa != null">
+                dr_number_weifa = #{drNumberWeifa,jdbcType=INTEGER},
+            </if>
+        </set>
+        where peopleid = #{peopleid,jdbcType=INTEGER}
+
+    </update>
+
+    <select id="selectNumber" parameterType="java.lang.Integer" resultType="com.kkb.bean.Drugpeople">
+
+    </select>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.kkb.bean.Drugpeople">
+        update drugpeople
+        set peopleId         = #{peopleid,jdbcType=INTEGER},
+            dr_number        = #{drNumber,jdbcType=INTEGER},
+            dr_number_Issued = #{drNumberIssued,jdbcType=INTEGER}
+        where dr_id = #{drId,jdbcType=INTEGER}
+    </update>
+
+
+    <!--新的-->
+    <insert id="addSendDrug" parameterType="drugpeople" useGeneratedKeys="true" keyProperty="peopelId">
+        INSERT INTO drugpeople (dr_id, peopleId, dr_number, dr_number_issued, dr_number_weifa, dr_create_time)
+        VALUES (#{drId}, #{peopleId}, #{drNumber}, #{drNumberIssued}, #{drNumberWeifa}, #{drCreateTime})
+    </insert>
+
+    <select id="getSendDrugListByRId" resultType="drugpeople">
+        SELECT *
+        FROM drugpeople
+        WHERE r_id = #{rId}
+    </select>
+
+    <select id="getgetSendDrugList" resultType="drugpeople">
+        SELECT *
+        FROM drugpeople
+    </select>
+
+
+    <update id="updateSendDrug" parameterType="drugpeople">
+        UPDATE drugpeople
+        <set>
+            <if test="drNumberIssued!=null">drugpeople.dr_number_issued=#{drNumberIssued},</if><!--已发数量-->
+            <if test="drNumberWeifa!=null">drugpeople.dr_number_weifa=#{drNumberWeifa},</if><!--未发数量-->
+            <if test="drNumber!=null">drugpeople.dr_number=#{drNumber}</if><!--药品数量-->
+        </set>
+        WHERE drugpeople.peopleId = #{peopleId} AND drugpeople.dr_id = #{drId}
+    </update>
+
+
+    <select id="getByDreId" resultMap="BaseResultMap">
+        SELECT *
+        FROM drugpeople
+        WHERE dp_id = #{dpId}
+    </select>
+
+    <select id="selectChongFu" resultMap="BaseResultMap">
+        select *
+        from drugpeople
+        where peopleId = #{peopleId}
+          and dr_id = #{drugId}
+    </select>
+
+</mapper>

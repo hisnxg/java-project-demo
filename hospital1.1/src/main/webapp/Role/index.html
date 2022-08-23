@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/style.css" />
+    <script type="text/javascript" src="../../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../Js/ckform.js"></script>
+    <script type="text/javascript" src="../../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+        a:link {
+            font-size: 12px;
+            text-decoration: none;
+        }
+        a:visited {
+            font-size: 12px;
+            text-decoration: none;
+        }
+        a:hover {
+            font-size: 12px;
+            text-decoration: underline;
+        }
+    </style>
+
+</head>
+<body>
+<form class="form-inline definewidth m20" id="myForm">
+    角色名称：
+    <input type="text" name="roleName" id="roleName"class="abc input-default" placeholder="" >&nbsp;&nbsp;
+    页号
+    <input  type="text" class="abc input-default"  placeholder="" id="pageNum" name="pageNum" value="1" /> &nbsp;
+    单页条数：
+    <select class="form-control" name="pageSize">
+        <option value="5" selected="selected">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+    </select> &nbsp;
+    <button type="button" onclick="loadData()" class="btn btn-primary">查询</button>
+
+</form>
+
+<table class="table table-bordered table-hover definewidth m10" >
+    <thead>
+    <tr>
+        <th width="5%"><input type="checkbox" id="checkall"></th>
+        <th>角色名称</th>
+        <th>状态</th>
+        <th width="10%">操作</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+
+    </tbody>
+</table>
+
+
+<table class="table table-bordered table-hover definewidth m10" >
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page">
+                <span id="total_role"></span>条记录
+                <span id="now_page"></span>/<span id="total_page"></span>页
+                <div name="pageDiv">
+                    <span name="pageSpan" id="first_page"><a href='javascript:void(0)'>首页</a></span>
+                    <span name="pageSpan" id="pre_page"><a href="javascript:void(0)">上一页</a></span>
+                    <span id="first_point">...</span>
+                    <span name="pageSpan" id="page1"><a href='javascript:void(0)'>1</a></span>
+                    <span name="pageSpan" id="page2"><a href='javascript:void(0)'>2</a></span>
+                    <span name="pageSpan" id="page3"><a href='javascript:void(0)'>3</a></span>
+                    <span name="pageSpan" id="page4"><a href='javascript:void(0)'>4</a></span>
+                    <span name="pageSpan" id="page5"><a href='javascript:void(0)'>5</a></span>
+                    <span id="last_point">...</span>
+                    <span name="pageSpan" id="next_page"><a href='javascript:void(0)' >下一页</a></span>
+                    <span name="pageSpan" id="last_page"><a href='javascript:void(0)' >尾页</a></span>
+                </div>
+            </div>
+            <div><button type="button" class="btn btn-success" id="newNav">添加角色 </button>&nbsp;&nbsp;&nbsp;
+                <button type="button" class="btn btn-success" id="delPro" onClick="delAll();">删除选中</button>
+            </div>
+        </th>
+    </tr>
+</table>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(function () {
+        loadData();
+        $('div[name="pageDiv"]>span').click(function(){
+            if(($(this).attr("class"))=='disabled'){
+                return;
+            }
+            let num=$(this).attr("name");
+            $("#pageNum").val(num);
+            loadData();
+        });
+        $('#newNav').click(function(){
+            window.location.href="addRole.html";
+        });
+
+        $('#checkall').click(function () {
+            checkall();
+        })
+    });
+
+    function fillPageData(pageInfo) {
+        if($("#pageNum").val() > pageInfo.pages){
+            $("#pageNum").val(pageInfo.pages);
+        }
+
+        if(pageInfo.pages <= 5){
+            $("#first_point").hide();
+            $("#last_point").hide();
+            for(let i = 1; i <= 5; i++){
+                $("#page" + i + ">a").attr("class", "");
+                $("#page" + i).hide();
+            }
+            for(let i = 1; i <= pageInfo.pages; i++){
+                let page = $("#page" + i);
+                page.show();
+                page.attr("name",i);
+                $("#page" + i + ">a").html(i);
+            }
+            $("#page" + pageInfo.pageNum + ">a").addClass("current");
+        }
+        else{
+            for(let i = 1; i <= 5; i++){
+                $("#page" + i).show();
+            }
+            if(pageInfo.pageNum < 4){
+                $("#first_point").hide();
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(i);
+                    $("#page" + i).attr("name", i);
+                }
+                $("#page" + pageInfo.pageNum + ">a").addClass("current");
+            }
+            else if(pageInfo.pageNum > pageInfo.pages - 3){
+                $("#last_point").hide();
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(pageInfo.pages + i - 5);
+                    $("#page" + i).attr("name", pageInfo.pages + i - 5);
+
+                }
+                $("#page" + (pageInfo.pageNum - pageInfo.pages + 5) + ">a").addClass("current");
+            }
+            else {
+                for(let i = 1; i <= 5; i++){
+                    let page = $("#page" + i + ">a");
+                    page.attr("class", "");
+                    page.html(pageInfo.pageNum + i - 3);
+                    $("#page" + i).attr("name", pageInfo.pageNum + i - 3);
+                }
+                $("#page3>a").addClass("current");
+            }
+            if(pageInfo.pageNum > 3){
+                $("#first_point").show();
+            }
+            if(pageInfo.pageNum < pageInfo.pages - 2){
+                $("#last_point").show();
+            }
+        }
+
+        $("#total_role").html(pageInfo.total);
+        $("#total_page").html(pageInfo.pages);
+        $("#now_page").html(pageInfo.pageNum);
+        $("select[name='pageSize']").val(pageInfo.pageSize);
+        $("#pageNum").val(pageInfo.pageNum);
+
+        //设置按钮的属性值和样式
+        $("#first_page").attr("name",1);
+        $("#pre_page").attr("name",pageInfo.prePage);
+        $("#next_page").attr("name",pageInfo.nextPage);
+        $("#last_page").attr("name",pageInfo.pages);
+        $("#first_page").removeClass("disabled");
+        $("#pre_page").removeClass("disabled");
+        $("#next_page").removeClass("disabled");
+        $("#last_page").removeClass("disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#first_page").addClass("disabled");
+            $("#pre_page").addClass("disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#next_page").addClass("disabled");
+            $("#last_page").addClass("disabled");
+        }
+    }
+
+    //更新按钮
+    function updateRole(roleId) {
+        let pageNum=$("#pageNum").val();
+        let pageSize=$("select[name='pageSize']").val();
+        window.location.href="editRole.html?roleId="+roleId+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+
+
+    //全选 全不选
+    function checkall(){
+        let all = document.getElementsByName("check");
+        let ch = document.getElementById("checkall");
+        if(ch.checked){
+            for(let i = 0; i < all.length; i++){
+                all[i].checked = true;
+            }
+        }else{
+            for(let i = 0; i <all.length; i++){
+                all[i].checked = false;
+            }
+        }
+    }
+
+    //删除所有选中
+    function delAll(){
+        let all=document.getElementsByName("check");
+        let roleIds=[];
+        for(let i=0;i<all.length;i++){
+            if(all[i].checked){
+                roleIds.push(all[i].value);
+            }
+        }
+        if(roleIds.length>0){
+            if(confirm("确认删除?")){
+                console.log("待删除的ids:"+roleIds);
+                $.ajax({
+                    type: "POST",
+                    url: "/role/all", //RESTful风格的API定义
+                    data:  "roleIds=" + roleIds + "&_method=DELETE",
+                    dataType: "json",
+                    success: function (vo) {
+                        if(vo.code === 200){
+                            alert("删除成功!");
+                            loadData();
+                        }else{
+                            alert("删除失败！"+vo.msg);
+                        }
+                    }
+                });
+            }
+        }else{
+            alert("请选中要删除的项");
+        }
+    }
+
+    //删除按钮
+    function deleteRole(roleId) {
+        if(confirm("确定要删除吗?")) {
+            //发起异步请求
+            $.ajax({
+                type: "POST",
+                url: "/role/" + roleId, //RESTful风格的API定义
+                data: "_method=DELETE",
+                success: function (vo) {
+                    if(vo.code==200){
+                        loadData();
+                    }else{
+                        alert("删除失败！"+vo.msg);
+                    }
+                }
+            });
+        }
+    }
+
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+
+    function loadData(){
+        let url = document.location.toString();
+        let pageNum = url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+        if(pageNum != null && pageNum !== "" && $("#pageNum").val() != null){
+            $("#pageNum").val(pageNum);
+        }
+        if(pageSize!=null&&$("select[name='pageSize']").val()!=null){
+            $("select[name='pageSize']").val(pageSize);
+        }
+
+        //alert($("#myForm").serialize())
+        $.ajax({
+            type: "GET",
+            url: "/role/list",
+            data: $("#myForm").serialize(),//主要是分页和多条件参数数据
+            dataType:"json",
+            success: function(vo){
+                //alert( "Data Saved: " + vo );
+                let list = vo.pageInfo.list;
+                let str = "";
+                for(let i = 0; i < list.length; i++){
+                    let obj = list[i];
+                    let roleId = obj.id;
+                    let roleName = obj.roleName;
+                    let status = obj.status === 0 ? "启用":"禁用";
+
+                    let btnStr="";
+                    if (obj.status==0){
+                        btnStr='<button onclick=\"updateRole(' + roleId + ')\">编辑</button>\n'
+                          //  +'<button onclick=\"deleteRole(' + roleId + ')\">删除</button>\n'
+                    }else {
+                        btnStr='<button href="#">已删</button>&nbsp;&nbsp;&nbsp;' + '<button onclick="updateRole('+roleId+')">编辑</button>&nbsp;' ;
+                    }
+
+
+                    str+='<tr>' +
+                        '            <td style="vertical-align:middle;"><input type="checkbox" name="check" value=' + roleId + '></td>' +
+                        '            <td>'+roleName+'</td>' +
+                        '            <td>'+status+'</td>' +
+                        '            <td>'+btnStr+'</td>' +
+                        '</tr>'
+                }
+
+                $("#tbody").html(str);
+                //填充分页数据
+                fillPageData(vo.pageInfo);
+            }
+        });
+    }
+</script>

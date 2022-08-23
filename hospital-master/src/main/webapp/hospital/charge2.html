@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>收费项目管理</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <style>
+        span{
+            color: #1EABFF;
+            padding: 0 5px;
+        }
+    </style>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+	 $(function () {
+		$('#newNav').click(function(){
+				window.location.href="charge-new.html";
+		 });
+    });
+	
+    	function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;	
+				}	
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;	
+				}	
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}		
+			}
+			if(ids.length>0){
+				if(confirm("确认操作?")){
+					alert("成功!");
+				}
+			}else{
+				alert("请选中要操作的项");
+			}
+		}
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="dispensing.html";
+		 });
+    });
+    </script>
+</head>
+<body>
+   
+<form id="myForm" action="charge.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号：</td>
+        <td><input type="text" name="id" value=""/></td>
+		
+        <td width="10%" class="tableleft">姓名：</td>
+        <td><input type="text" name="registerName" value=""/></td>
+    </tr>
+    <tr>
+		
+		
+		  <td colspan="4">
+			<center>
+				<button type="button" onclick="loadData()" class="btn btn-primary">查询</button>
+				<button type="reset" class="btn btn-primary">清空</button>
+			</center>
+        </td>
+    </tr>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10" >
+   <thead>
+    <tr>
+        <th>病历号</th>
+        <th>姓名</th>
+        <th>住院日期</th>        
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="tboby">
+	     <tr>
+            <td style="vertical-align:middle;">1103</td>
+            <td style="vertical-align:middle;">黄飞鸿</td>
+            <td style="vertical-align:middle;">2015-01-04 10:34:33</td>
+            <td style="vertical-align:middle;">
+				<a href="account-look2.html">详情</a>
+				<a href="charge-new.html">添加收费项</a>
+			</td>
+        </tr>
+    </tbody>
+  </table>
+
+
+    <table class="table table-bordered table-hover definewidth m10" >
+        <tr>
+            <th colspan="5">
+                <div class="inline pull-right page">
+                    <a name="" id="firstPage" onclick="A()" >第一页</a>
+                    <a name="" id="prePage" onclick="B()">上一页</a>
+                    <span id="currentPage"></span>
+                    <a name="" id="nextPage" onclick="C()" >下一页</a>
+                    <a name="" id="lastPage" onclick="D()" >最后一页</a>
+            &nbsp;&nbsp;&nbsp;共<span id="total" class='current'></span>条记录
+                    <span id="pageNum"></span>/<span id="pages"></span>页
+                    <span id="pageSize" class="hidden"></span>
+                </div>
+            </th>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+<script>
+    $(function (){
+        loadData();
+    })
+    function A () {
+        if ($("#firstPage").attr("class")=="btn btn-small disabled"){
+            return;
+        }
+        let num=$("#firstPage").attr("name");
+        $("#pageNum").html(num);
+        loadData();
+    };
+    function B() {
+        if ($("#prePage").attr("class")=="btn btn-small disabled"){
+            return;
+        }
+        let num=$("#prePage").attr("name");
+        $("#pageNum").html(num);
+        loadData();
+    };
+    function C () {
+        if ($("#nextPage").attr("class")=="btn btn-small disabled"){
+            return;
+        }
+        let num=$("#nextPage").attr("name");
+        $("#pageNum").html(num);
+        loadData();
+    };
+    function D () {
+        if ($("#lastPage").attr("class")=="btn btn-small disabled"){
+            return;
+        }
+        let num=$("#lastPage").attr("name");
+        $("#pageNum").html(num);
+        loadData();
+    };
+    function E (j) {
+        $("#pageNum").html(j);
+        loadData();
+    };
+    function fillPageData(pageInfo) {
+        //填充信息
+        $("#total").html(pageInfo.total);
+        $("#pages").html(pageInfo.pages);
+        $("#pageNum").html(pageInfo.pageNum);
+        $("#pageSize").html(pageInfo.pageSize);
+        let str="";
+        for(let i=1;i<=pageInfo.pages;i++){
+            str+='<a onclick=E('+i+')>'+i+'</a>';
+        }
+        $("#currentPage").html(str);
+
+        //设置按钮的属性值和样式
+        $("#firstPage").attr("name",1);
+        $("#prePage").attr("name",pageInfo.prePage);
+        $("#nextPage").attr("name",pageInfo.nextPage);
+        $("#lastPage").attr("name",pageInfo.pages);
+        $("#firstPage").removeClass("btn btn-small disabled");
+        $("#prePage").removeClass("btn btn-small disabled");
+        $("#nextPage").removeClass("btn btn-small disabled");
+        $("#lastPage").removeClass("btn btn-small disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#firstPage").addClass("btn btn-small disabled");
+            $("#prePage").addClass("btn btn-small disabled");
+            $("#current1").addClass("btn btn-small disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#nextPage").addClass("btn btn-small disabled");
+            $("#lastPage").addClass("btn btn-small disabled");
+        }
+    }
+
+    function info(hospitalId){
+        let pageNum=$("#pageNum").html();
+        let pageSize=$("#pageSize").html();
+        window.location.href="/charge/list?id="+hospitalId+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+    function add(hospitalId){
+        let pageNum=$("#pageNum").html();
+        let pageSize=$("#pageSize").html();
+        window.location.href="/charge/addAdvance?id="+hospitalId+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+    //加载数据
+    function loadData(){
+        let pageNum=$("#pageNum").html();
+        let pageSize=$("#pageSize").html();
+        $.ajax({
+            type: "GET",
+            url: "/hospital/list",
+            data:  "id="+$("input[name='id']").val()+"&registerName="+$("input[name='registerName']").val()+"&pageNum="+pageNum+"&pageSize="+pageSize,
+            dataType:"json",
+            success: function(vo){
+                //alert( "Data Saved: " + vo );
+                let list=vo.pageInfo.list;
+                let str="";
+                for(let i=0;i<list.length;i++){
+                    let obj=list[i];
+                    let id=obj.id;
+                    let registerName=obj.register.registerName;
+                    let hospitalDate=obj.hospitalDate;
+                    btnStr='<a onclick="info('+id+')">详情</a>&nbsp;'+
+                            '<a onclick="add('+id+')">添加收费项</a>&nbsp;';
+                    str+='<tr>' +
+                        '<td style="vertical-align:middle;">'+id+'</td>' +
+                        '<td style="vertical-align:middle;">'+registerName+'</td>' +
+                        '<td style="vertical-align:middle;">'+hospitalDate+'</td>' +
+                        '<td style="vertical-align:middle;">'+btnStr+'</td>'
+                    +'</tr>';
+
+                    $("#tboby").html(str);
+                }
+                //填充分页数据
+                fillPageData(vo.pageInfo);
+            }
+        });
+    }
+</script>

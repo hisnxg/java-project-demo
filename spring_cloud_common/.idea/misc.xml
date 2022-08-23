@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/03_cloud_common/pom.xml" />
+        <option value="$PROJECT_DIR$/01_cloud_payment/pom.xml" />
+        <option value="$PROJECT_DIR$/02_cloud_order/pom.xml" />
+        <option value="$PROJECT_DIR$/04_cloud_eureka/pom.xml" />
+        <option value="$PROJECT_DIR$/05_cloud_gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/config-server/pom.xml" />
+        <option value="$PROJECT_DIR$/upload_service/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

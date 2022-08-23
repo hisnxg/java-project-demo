@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>更改挂号--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+
+
+    <script type="text/javascript">
+        $(function () {
+            $('#backid').click(function(){
+                    window.location.href="index.html";
+             });
+            initData();
+            getDoctorName();
+        });
+       function initData(){
+            $.ajax({
+                url:"findallkeshi",
+                type:"get",
+                success:function (data){
+                    let allKeshi = data.data.allKeshi;
+                    $.each(allKeshi,function (index,doctor){
+                        $("#dKeshi").append("<option value='"+doctor.dKeshi+"'>"+doctor.dKeshi+"</option>")
+                    })
+                }
+            })
+        }
+        //TODO
+        function getDoctorName(){
+           let keshi = $("#dKeshi").val();
+           $.ajax({
+               url:"getDoctorNameByKeshi",
+               type:"get",
+               data:{"dKeshi":keshi},
+               dataType: "json",
+               success:function (data){
+                   let list = data.data.list;
+                   //清空option
+                   var cTime=document.getElementById("dName");
+                   cTime.options.length=0;
+                   console.log("-------");
+                   $.each(list,function (index,doctor){
+                       $("#dName").append("<option value='"+doctor.dId+"'>"+doctor.dName+"</option>")
+                   })
+               }
+           })
+        }
+
+        function mybaocun(){
+            console.log("sdfs");
+            var hosrId = $("input[name='hosrId']").val();
+            var hosrIdcar = $("input[name='hosrIdcar']").val();
+            var hosrMedical = $("input[name='hosrMedical']").val();
+            var hosrRegprice = $("input[name='hosrRegprice']").val();
+            var hosrPhone = $("input[name='hosrPhone']").val();
+            var hosrSelfprice = $("input[name='hosrSelfprice']").val();
+            var hosrSex = $("input[name='hosrSex']").val();
+            var hosrAge = $("input[name='hosrAge']").val();
+            var hosrWork = $("input[name='hosrWork']").val();
+            var hosrLookdoctor = $("input[name='hosrLookdoctor']").val();
+            var dId = $("#dName").val();
+            var hosrName = $("#hosrName").val();
+            //var dKeshi = $("#dKeshi").val();
+            var hosrRemark = $("#hosrRemark").val();
+
+            //数据验证
+            if (hosrName == null || hosrName == '') {
+                alert("名字为空");
+                return;
+            }
+            //手机号验证
+            if (hosrPhone == null || hosrPhone == '') {
+                alert("手机号为空");
+                return;
+            } else {
+                let myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+                if (!myreg.test(hosrPhone)) {
+                    alert("手机号格式不正确!");
+                    return;
+                }
+            }
+            if (hosrWork == null || hosrWork == '') {
+                alert("职业为空");
+                return;
+            }
+
+            if (hosrMedical == null || hosrMedical == '') {
+                alert("社保号为空");
+                return;
+            } else {
+                var myreg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                if (!myreg.test(hosrIdcar)) {
+                    alert("社保号格式不正确")
+                    $("input[name='hosrMedical']").val("");
+                    return;
+                }
+            }
+
+
+            $.ajax({
+                url: "http://localhost:8080/registration/addRegistration",
+                data: {
+                    'hosrId': hosrId,
+                    'hosrName': hosrName,
+                    'hosrIdcar': hosrIdcar,
+                    'hosrMedical': hosrMedical,
+                    'hosrRegprice': hosrRegprice,
+                    'hosrPhone': hosrPhone,
+                    'hosrSelfprice': hosrSelfprice,
+                    'hosrSex': hosrSex,
+                    'hosrAge': hosrAge,
+                    'hosrWork': hosrWork,
+                    'hosrLookdoctor': hosrLookdoctor,
+                    'dId':dId,
+                    'hosrRemark': hosrRemark
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (response) {
+                    console.info(response)
+                    console.info(response.data)
+                    if (response.response.flag){
+                        window.location.href = "index.html";
+                    }else{
+                        alert("添加失败，请重试！");
+                    }
+                    $("#hosrId").val("");
+                    $("#hosrName").val("");
+                    $("#hosrIdcar").val("");
+                    $("#hosrMedical").val("");
+                    $("#hosrRegprice").val("");
+                    $("#hosrPhone").val("");
+                    $("#hosrSelfprice").val("");
+                    $("#hosrSex").val("");
+                    $("#hosrAge").val("");
+                    $("#hosrWork").val("");
+                    $("#hosrLookdoctor").val("");
+                    $("#dKeshi").val("");
+                    $("#dName").val("");
+                    $("#dId").val("");
+                    $("#hosrRemark").val("");
+                }
+            })
+        }
+
+        // F 女 , M 男 (female 女,male 男)
+        function getSexByIdNO(IdNO) {
+            if (IdNO.length == 18) {
+                return IdNO.charAt(16) % 2 == 0 ? "F" : "M";
+            } else if (IdNO.length == 15) {
+                return IdNO.charAt(14) % 2 == 0 ? "F" : "M";
+            } else {
+                return "";
+            }
+        }
+
+        function changeIdCar() {
+            console.log("哈哈哈哈哈")
+            let hosrIdcar = $("input[name='hosrIdcar']").val();
+            //身份证号验证
+                if (hosrIdcar == null || hosrIdcar == '') {
+                    alert("请输入正确的身份证号");
+                    return;
+                } else {
+                    var myreg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+                    if (!myreg.test(hosrIdcar)) {
+                        alert("身份证格式不正确")
+                        $("hosrIdcar").val("");
+                        return;
+                    }
+                }
+                //获取性别
+                /*let sexBox = $("input[name='hosrSex']");
+            console.log(getSexByIdNO(hosrIdcar));
+            if (sexBox != '') {
+                    if (getSexByIdNO(hosrIdcar) == 'F') {
+                        sexBox.prop({"value": "1"})
+
+                    } else {
+                        sexBox.prop({"value": "0"})
+                    }
+                } else {
+                    console.log("获取性别失败")
+                }*/
+            let sexBox = $("input[name='hosrSex']");
+            if (getSexByIdNO(hosrIdcar) == 'F') {
+                sexBox.prop({"value": "1"});
+                document.getElementById("women").checked=true;
+                document.getElementById("man").checked=false;
+            } else {
+                sexBox.prop({"value": "0"});
+                document.getElementById("women").checked=false;
+                document.getElementById("man").checked=true;
+            }
+
+            //获取年龄
+            function getAge(userCard) {
+                //获取年龄
+                var yearBirth = userCard.substring(6, 10);
+                var monthBirth = userCard.substring(10, 12);
+                var dayBirth = userCard.substring(12, 14);
+                //获取当前年月日并计算年龄
+                var myDate = new Date();
+                var monthNow = myDate.getMonth() + 1;
+                var dayNow = myDate.getDay();
+                var age = myDate.getFullYear() - yearBirth;
+                if (monthNow < monthBirth || (monthNow == monthBirth && dayNow < dayBirth)) {
+                    age--;
+                }
+                // let nowYear = new Date(),getFullYear;
+                // let my =  getBirthdayByIdNO(userCard).split("-")[0]
+                return age;
+            }
+            //获取年龄
+            $("input[name='hosrAge']").val(getAge(hosrIdcar));
+        }
+
+
+
+    </script>
+</head>
+<body>
+<form action="#" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td><input id="hosrName" type="text" name="hosrName" value="" /></td>
+    </tr>
+
+    <tr>
+        <td width="10%" class="tableleft">身份证号</td>
+        <td><input id="hosrIdcar" type="text" name="hosrIdcar" value="" onchange="changeIdCar()"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">社保号</td>
+        <td><input id="hosrMedical" type="text" name="hosrMedical" value=""/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">挂号费</td>
+        <td><input id="hosrRegprice" type="text" name="hosrRegprice" value=""/>元</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">联系电话</td>
+        <td><input id="hosrPhone" type="text" name="hosrPhone" value=""/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">是否自费</td>
+        <td><input id="hosrSelfprice" type="radio" name="hosrSelfprice" value="0" checked/>否&nbsp;&nbsp;&nbsp;
+            <input id="hosrSelfprice1" type="radio" name="hosrSelfprice" value="1"/>是</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">性别</td>
+        <td><input  type="radio" name="hosrSex" id="man" value="0" />男&nbsp;&nbsp;&nbsp;
+            <input  type="radio" name="hosrSex" id="women" value="1" />女</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">年龄</td>
+        <td><input id="hosrAge" type="text" name="hosrAge" value=""/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">职业</td>
+        <td><input id="hosrWork" type="text" name="hosrWork" value=""/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">初复诊</td>
+        <td><input  type="radio" name="hosrLookdoctor" value="0" checked/>初诊&nbsp;&nbsp;&nbsp;
+            <input  type="radio" name="hosrLookdoctor" value="1"/>复诊</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">所挂科室</td>
+        <td><select id="dKeshi" name="dKeshi" onblur="getDoctorName()">
+            <!--<option  name="急诊科" value="急诊科">急诊科</option>
+            <option name="骨科" value="骨科">骨科</option>
+            <option name="内科" value="内科">内科</option>-->
+            </select></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">指定医生</td>
+        <td><select id="dName" name="dName" >
+            <!--<option name="测试" value="测试">测试</option>
+            <option name="测试02" value="测试02">测试02</option>
+            <option name="王英鹏03" value="王英鹏03">王英鹏03</option>-->
+        </select></td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td><textarea id="hosrRemark" name="hosrRemark"></textarea></td>
+	</tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button class="btn btn-primary" type="button" id="baocun" value="保存" onclick="mybaocun()">保存</button>&nbsp;&nbsp;
+                <button type="button" class="btn btn-success" name="backid" id="backid" value="返回列表">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

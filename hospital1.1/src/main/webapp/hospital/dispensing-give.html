@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>发药--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form action="dispensing.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td name="hid">1101</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td name="registerName">黄飞鸿</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td name="drugs"><select name="drugs"><option>2304-九九感冒药</option></select></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">发药数量</td>
+        <td><input type="text" name="number" value=""/></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button onclick="giveDrug()" class="btn btn-primary" type="button">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+
+<script type="text/javascript">
+
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return decodeURI(r[2]); return null;
+    }
+
+    $(function () {
+        let url = document.location.toString();//获取URL
+        let hid=url.GetValue("hid");
+        // console.log(url.GetValue("registerName"));
+        let registerName=url.GetValue("registerName");
+        // let pageNum=url.GetValue("pageNum");
+        // let pageSize=url.GetValue("pageSize");
+        console.log(hid);
+        console.log(registerName)
+        queryById(hid,registerName);
+    })
+
+    //查询该住院病人的用药信息
+    function queryById(hid,registerName) {
+        $.ajax({
+            type: "GET",
+            url: "/dispensing/"+hid, //RESTFul风格的API定义
+            data: "",
+            success: function (vo) {
+                let drugs=vo.list;
+                let str="";
+                str+='<select name="drugs">'
+                for(let i=0;i<drugs.length;i++){
+                    str+='<option value="+'+drugs[i].id+'+">'+drugs[i].drugName+'</option>'
+                }
+                str+='</select>'
+                $("td[name='hid']").html(hid);
+                $("td[name='registerName']").html(registerName);
+                $("td[name='drugs']").html(str);
+            }
+        });
+    }
+
+    //发药
+    function giveDrug() {
+        let hid = $("td[name='hid']").html();
+        let drugId = $("select[name='drugs']").val();
+        let number = $("input[name='number']").val();
+        if(number === 0 || number==null){
+            alert("请输入发药数量！")
+        }else{
+            $.ajax({
+                type: "POST",
+                url: "/dispensing/give/"+hid, //RESTFul风格的API定义
+                data: "drugId="+drugId+"&number="+number+"&_method=PUT",
+                success: function (vo) {
+                    if (vo.code===200){
+                        alert("添加成功");
+                    }else {
+                        alert("添加失败！"+vo.msg);
+                    }
+                }
+            });
+        }
+
+    }
+
+    $('#backid').click(function(){
+        window.location.href="dispensing.html";
+    });
+
+</script>
+</body>
+</html>

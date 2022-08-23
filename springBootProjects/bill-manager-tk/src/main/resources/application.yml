@@ -1,0 +1,20 @@
+# 连接池
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: Mysql916.
+    url: jdbc:mysql://139.224.55.130:3306/bill-manager?useSSL=false
+  thymeleaf:
+    cache: false #关闭thymeleaf缓存
+
+#整合mybatis
+mybatis:
+  type-aliases-package: com.nxg.entity #别名扫描
+  mapper-locations: classpath:/mybatis/*.xml
+
+#日志
+logging:
+  level:
+    com.nxg: debug
+

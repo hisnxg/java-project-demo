@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加药品--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        let drugId = window.location.href.split("?")[1].split("=")[1];
+        $(function () {
+            $('#backid').click(function(){
+                    window.location.href="index.html";
+             });
+            initData(drugId);
+            $("#baocun").click(function () {
+                $("#baocun").attr("onsubmit",true)
+                let addNumber = $("#addNumber1").val();
+                $.ajax({
+                    url: "addDrugNumber",
+                    data:{"drugId":drugId,"addNumber":addNumber},
+                    type: "post",
+                    dataType: "json",
+                    success:function (data) {
+                        console.log(data.response.code);
+                        if (data.response.code=="200"){
+                            window.location.href="index.html";
+                        }
+                    }
+                })
+            });
+        });
+        console.log(drugId);
+        function initData(drugId) {
+            $.ajax({
+                url:"queryDrugById",
+                data: {"drugId":drugId},
+                type: 'get',
+                dataType: 'json',
+                success: function (data){
+                    let drug = data.data.drug;
+                    $("#drugId").text(drug.drId);
+                    $("#drugName").text(drug.drName);
+                    $("#drugNumber").text(drug.drNumber);
+                }
+            })
+        }
+
+
+    </script>
+</head>
+<body>
+<form action="index.html" method="post" class="definewidth m20" id="addNumberForm">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">药品编号</td>
+        <td id="drugId">J1121</td>
+    </tr> 
+	
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td id="drugName">感冒药</td>
+    </tr>    
+	<tr>
+        <td width="10%" class="tableleft">余量</td>
+        <td id="drugNumber">300</td>
+    </tr>    
+	
+    <tr>
+        <td width="10%" class="tableleft">数量</td>
+        <td>
+			<input id="addNumber1" type="text" />
+		</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">
+			<center>
+				<button id="baocun" type="button" onsubmit="return false" class="btn btn-primary">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="05_cloud_gateway" />
+        <module name="04_cloud_eureka" />
+        <module name="03_cloud_common" />
+        <module name="config-server" />
+        <module name="01_cloud_payment" />
+        <module name="02_cloud_order" />
+        <module name="upload_service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="8">
+      <module name="01_cloud_payment" target="1.8" />
+      <module name="02_cloud_order" target="1.8" />
+      <module name="03_cloud_common" target="1.5" />
+      <module name="04_cloud_eureka" target="1.8" />
+      <module name="05_cloud_gateway" target="1.8" />
+      <module name="config-server" target="1.8" />
+      <module name="upload_service" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="01_cloud_payment" options="-parameters" />
+      <module name="02_cloud_order" options="-parameters" />
+      <module name="04_cloud_eureka" options="-parameters" />
+      <module name="05_cloud_gateway" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="upload_service" options="-parameters" />
+    </option>
+  </component>
+</project>

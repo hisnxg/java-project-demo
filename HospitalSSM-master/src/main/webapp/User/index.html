@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+     $(function () {
+		$('#newNav').click(function(){
+				window.location.href="addUser.html";
+		 });
+         <!--初始化参数-->
+         initData("");
+    });
+
+     function initData(username){
+         $.ajax({
+             url: "http://localhost:8080/user/selectUser",
+             data: {'userName':username},
+             type: 'post',
+             dataType: 'json',
+             success: function (data){
+                 console.log(data)
+                 //清空下级标签
+                 $("#xunhuan").empty();
+                 let page = data.data.userPage;
+                 let param = data.data.param;
+                 let list = page.list;
+
+                 //console.log(list)
+                 //遍历数据
+                 $.each(list,function (index,user){
+
+                     $("#xunhuan").append(
+                         "<tr >\n" +
+                         "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"" + user.uId + "\"></td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+user.uLoginname+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+user.uTruename+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">"+user.role.rName+"</td>\n" +
+                         "    <td style=\"vertical-align:middle;\"><a href=\"editUser.html?uId="+user.uId+"\">编辑</a>&nbsp;&nbsp;&nbsp;<a id='SCSC' onclick='shanchu(" + user.uId + ")' href=\"#\">删除</a></td>\n" +
+                         "</tr>")
+                     //查询参数回显
+                     $("#username").val(param.userName);
+
+                     //分页
+                     //$("#pageNum").text(page.pageNum+"/"+page.pages);
+                    // $("#totalMsg").text(page.pages);
+                     new Pagination({
+                         element: '#pages',
+                         type: 2,
+                         layout: 'prev, pager, next, total, jumper',
+                         pageIndex: 1,
+                         pageSize: 5,
+                         pageCount: 9,
+                         total: page.total,
+                         singlePageHide: false,
+                         disabled: true,
+                         currentChange: function(index) {
+                             $.ajax({
+                                 url: "http://localhost:8080/user/selectUser",
+                                 data: {'pageNum':index,'userName':username},
+                                 type: 'post',
+                                 dataType: 'json',
+                                 success: function (data){
+                                     //清空下级标签
+                                     $("#xunhuan").empty();
+                                     let page = data.data.userPage;
+                                     let param = data.data.param;
+                                     let list = page.list;
+                                     //遍历数据
+                                     $.each(list,function (index,user){
+                                         $("#xunhuan").append(
+                                             "<tr >\n" +
+                                             "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"" + user.uId + "\"></td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+user.uLoginname+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+user.uTruename+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">"+user.role.rName+"</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\"><a href=\"editUser.html?uId="+user.uId+"\">编辑</a>&nbsp;&nbsp;&nbsp;<a id='SCSC' onclick='shanchu(" + user.uId + ")' href=\"#\">删除</a></td>\n" +
+                                             "</tr>")
+
+                                         //查询参数回显
+                                         $("#username").val(param.userName);
+                                     })
+                                 }
+                             });
+
+
+
+
+
+                         }
+
+                     });
+                 })
+             }
+         });
+     }
+
+     function selectUser(){
+
+         let userName = $("#username").val();
+
+         initData(userName);
+     }
+
+
+    function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;
+				}
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;
+				}
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}
+			}
+			if(ids.length>0){
+				if(confirm("确认删除?")){
+
+					alert("删除成功!");
+				}
+			}else{
+				alert("请选中要删除的项");
+			}
+		}
+
+     function delpro(){
+         var ids = [];
+         $("input[name='check']:checked").each(function(i){
+             ids.push($(this).val())
+         })
+         //console.log(ids)
+         if (ids.length>0) {
+             if(confirm("是否要删除选中信息")==true) {
+                 $.ajax({
+                     url: "http://localhost:8080/user/deleteUserByIds",
+                     data: {"userIds": ids},
+                     traditional: true,
+                     type: 'post',
+                     success: function (resp) {
+                         if (resp.response.flag) {
+                             initData("")
+                         } else {
+                             alert("删除失败");
+                         }
+                     }
+                 })
+             }
+         }else {
+             alert("请选择要删除的数据");
+         }
+     }
+
+    </script>
+</head>
+<body>
+<form class="form-inline definewidth m20" action="#" method="post">
+    用户名称：
+    <input type="text" name="username" id="username" class="abc input-default" placeholder="" value="">&nbsp;&nbsp;
+    <input class="btn btn-primary" type="button" onclick="selectUser()" value="查询">
+</form>
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+    	<th width="5%"><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>用户账户</th>
+        <th>真实姓名</th>
+        <th>角色</th>
+        <th  width="10%">操作</th>
+    </tr>
+    </thead>
+    <tbody id="xunhuan">
+    <tr >
+        <td style="vertical-align:middle;"><input type="checkbox" name="checkall" value="1"></td>
+        <td style="vertical-align:middle;">user</td>
+        <td style="vertical-align:middle;">程俊</td>
+        <td style="vertical-align:middle;">管理</td>
+        <td style="vertical-align:middle;"><a href="editUser.html">编辑</a>&nbsp;&nbsp;&nbsp;<a href="javascript:alert('删除成功！');">删除</a></td>
+    </tr>
+    </tbody>
+</table>
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="pages">
+
+            </div>
+        <div><button type="button" class="btn btn-success" id="newNav">添加用户</button>
+            <button type="button" class="btn btn-success" id="delpro" onclick="delpro()">删除选中</button>
+        </div>
+    </th></tr>
+</table>
+</body>
+<script>
+    //删除
+    function shanchu(id){
+        if(confirm("是否要删除")==true) {
+            $.ajax({
+                url: "http://localhost:8080/user/deleteUser",
+                data: {'uId': id},
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    if (data.response.flag) {
+                        //重新加载数据
+                        initData("");
+                    } else {
+                        alert("删除失败，请重试")
+                    }
+                }
+            });
+        }
+
+        //取消默认行为
+        return false;
+    }
+</script>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="/Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap1.js"></script>
+    <link rel="stylesheet" type="text/css" href="/Css/bootstrap1.css" />
+    <link rel="stylesheet" type="text/css" href="/Css/style1.css" />
+
+    <link href="/Css/fileinput.css" media="all" rel="stylesheet" type="text/css" />
+    <script src="/Js/fileinput.js" type="text/javascript"></script>
+    <script src="/Js/fileinput_locale_zh.js" type="text/javascript"></script>
+</head>
+
+<body>
+<h2>更新药品图片</h2>
+<form id="myForm" class="form-horizontal" action="/drug/" method="post">
+    <input name="pageNum" type="hidden"/>
+    <input name="pageSize" type="hidden"/>
+    <input name="drugId" type="hidden"/>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">药品名称:</label>
+        <div class="col-sm-9">
+            <input name="drugName" type="text" disabled/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">现有药品logo:</label>
+        <div class="col-sm-9">
+            <img name="drugLogo" src="/Images/"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-1 control-label">选择药品新logo</label>
+        <div class="col-sm-3">
+            <input id="logo" name="logo"  type="file" required/>
+        </div>
+    </div>
+</form>
+</body>
+</html>
+<script>
+    String.prototype.GetValue= function(para) {
+        var reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        var r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+
+    function queryAndShowInfo(drugId){
+        //查询球队的名称和logo并回显到页面上
+        $.ajax({
+            type: "GET",
+            url: "/drug/"+drugId, //RESTful风格的API定义
+            data: "",
+            success: function (vo) {
+                var obj=vo.obj;
+                var drugId=obj.id;
+                var drugImagePath=obj.img;
+                var drugName=obj.drugName;
+                $("input[name='drugName']").val(drugName);
+                if(drugImagePath!=null){
+                    $("img[name='drugLogo']").attr("src","/Images/"+drugImagePath);
+                }else{
+                    $("img[name='drugLogo']").addClass("hidden");
+                    $("img[name='drugLogo']").parent().html("还没有上传logo图片");
+                }
+            }
+        });
+    }
+
+    $(function () {
+        //从url中获取页码和size的参数值
+        let url = document.location.toString();
+        // var pageNum=url.GetValue("pageNum");
+        // var pageSize=url.GetValue("pageSize");
+        let drugId=url.GetValue("drugId");
+        // if (pageNum==null || pageNum==""){
+        //     $("input[name='pageNum']").val(1);
+        // }
+        // if (pageSize==null || pageSize ==""){
+        //     $("input[name='pageSize']").val(5);
+        // }
+        // $("input[name='pageNum']").val(pageNum);
+        // $("input[name='pageSize']").val(pageSize);
+        $("input[name='drugId']").val(drugId);
+        //查询球队的名称和logo并回显到页面上
+        queryAndShowInfo(drugId);
+        myUploadLogo(drugId);
+    });
+
+    function myUploadLogo(drugId) {
+        //使用js把文件域转换成fileinput对象
+        $("#logo").fileinput({
+            uploadUrl:"/drug/"+drugId, //接受请求地址
+            uploadAsync : true, //默认异步上传
+            showUpload : true, //是否显示上传按钮,跟随文本框的那个
+            showRemove : true, //显示移除按钮,跟随文本框的那个
+            showCaption : true,//是否显示标题,就是那个文本框
+            showPreview : true, //是否显示预览,不写默认为true
+            dropZoneEnabled : false,//是否显示拖拽区域，默认不写为true，但是会占用很大区域
+            //minImageWidth: 50, //图片的最小宽度
+            //minImageHeight: 50,//图片的最小高度
+            //maxImageWidth: 1000,//图片的最大宽度
+            //maxImageHeight: 1000,//图片的最大高度
+            //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+            //minFileCount: 0,
+            maxFileCount : 1, //表示允许同时上传的最大文件个数
+            enctype : 'multipart/form-data',
+            validateInitialCount : true,
+            /* previewFileIcon : "<i class='glyphicon glyphicon-king'></i>",*/
+            msgFilesTooMany : "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+            allowedFileTypes : [ 'image' ],//配置允许文件上传的类型
+            allowedPreviewTypes : [ 'image' ],//配置所有的被预览文件类型
+            // allowedPreviewMimeTypes : ['image/jpeg','image/jpg'],//控制被预览的所有mime类型
+            language : 'zh'
+        });
+        //异步上传返回结果处理
+        $('#logo').on('fileerror', function(event, data, msg) {
+            alert("上传失败！"+msg);
+        });
+        //异步上传返回结果处理
+        $("#logo").on("fileuploaded", function(event, data, previewId, index) {
+            let ref = $(this).attr("data-ref");
+            $("input[name='" + ref + "']").val(data.response.url);
+            //上传成功
+            window.location.href = "/medicine/index.html";
+        });
+    }
+
+
+</script>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>录入住院信息</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+<!--    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>-->
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+    });
+    </script>
+</head>
+<body>
+<form action="index.html" method="get" class="definewidth m20" id="myForm">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td><input type="text" name="hosR_id" placeholder="输入病历号回车自动带出挂号人信息"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td><input type="text" name="hosR_name" placeholder="姓名"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件类型</td>
+        <td>身份证</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件号</td>
+        <td><input type="text" name="hosR_idCar" placeholder="身份证号"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">社保号</td>
+        <td><input type="text" name="hosR_medical" placeholder="社保号"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">联系电话</td>
+        <td><input type="text" name="hosR_phone" placeholder="联系电话"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">是否自费</td>
+        <td>
+            <input type="radio" name="hosR_selfPrice" value="1" checked/>否&nbsp;&nbsp;&nbsp;
+            <input type="radio" name="hosR_selfPrice" value="0"/>是
+        </td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">性别</td>
+        <td>
+            <input type="radio" name="hosR_sex" value="1" checked/>男&nbsp;&nbsp;&nbsp;
+            <input type="radio" name="hosR_sex" value="0"/>女</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">年龄</td>
+        <td><input type="number" name="hosR_age"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">初复诊</td>
+        <td>
+            <input type="radio" name="hosR_lookDoctor" value="初诊" checked/>初诊
+            <input type="radio" name="hosR_lookDoctor" value="复诊"/>复诊
+        </td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">所挂科室</td>
+        <td>
+<!--            <select id="dept" name="dept">-->
+<!--                <option>请选择科室</option>-->
+<!--            </select>-->
+        </td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">指定医生</td>
+        <td>
+            <select id="select" name="d_id">
+                <option>请选择挂号医生</option>
+            </select>
+        </td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td><input type="text" name="hosR_remark"/></td>
+	</tr>
+    <tr>
+        <td width="10%" class="tableleft">护理</td>
+        <td><input type="text" name="beH_nursePeople"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">床位号</td>
+        <td><input type="text" name="beH_patBed"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">缴费押金</td>
+        <td><input type="text" name="beH_antecedent"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">病情</td>
+        <td><textarea name="beH_illness"></textarea></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button type="submit" class="btn btn-primary" type="button" id="btnAdd">保存</button> &nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+<script>
+    $(function () {
+        loadFunction();
+        //提交按钮的单击事件
+        $("#btnAdd").click(function () {
+            $.ajax({
+                type: "GET",
+                url: "/hos/add",
+                data: $("#myForm").serialize(),
+                dataType:"json",
+                success: function(vo){
+                    alert(1)
+                    window.location.href = "/hospital/index.html";
+                }
+            });
+        });
+    });
+    function loadFunction() {
+        $.ajax({
+            type: "get",
+            url: "/doctor",
+            data: null,
+            dataType:"json",
+            success: function(vo){
+                console.log(vo);
+                let doctorList=vo.list;
+                var str="";
+                for (var i = 0; i <doctorList.length; i++) {
+                    str+='<option name="d_id" value="'+doctorList[i].doctorId+'">'+doctorList[i].doctorName+'</option>>';
+                }
+                $("#select").html(str);
+            }
+        });
+        $.ajax({
+            type: "get",
+            url: "/dept/list",
+            data: null,
+            dataType:"json",
+            success: function(vo){
+                console.log(vo);
+                let deptList=vo.list;
+                var str="";
+                for (var i = 0; i <deptList.length; i++) {
+                    str+='<option value="'+deptList[i].deptId+'">'+deptList[i].deptName+'</option>>';
+                }
+                $("#dept").html(str);
+            }
+        });
+    }
+</script>
+</body>
+</html>

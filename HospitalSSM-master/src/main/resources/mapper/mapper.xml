@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kkb.dao.HeMapper">
+    <select id="selectUserLogin" resultType="java.lang.Integer" parameterType="User">
+        select u_id from user where u_loginName = #{uLoginname} AND u_password = #{uPassword}
+    </select>
+
+    <select id="selectUserState" resultType="java.lang.Integer" parameterType="User">
+        select u_state from user where u_id=#{uId}
+    </select>
+
+    <select id="selectUserPassword" parameterType="User" resultType="java.lang.String">
+        select u_password from user where u_id = #{uId};
+    </select>
+
+    <update id="updateUserPassword"    parameterType="com.kkb.bean.User">
+        UPDATE user SET u_password = #{uPassword} WHERE u_id = #{uId}
+    </update>
+
+    <select id="selectUserName" resultType="java.lang.String">
+        select u_trueName from user where u_id = #{id}
+    </select>
+</mapper>

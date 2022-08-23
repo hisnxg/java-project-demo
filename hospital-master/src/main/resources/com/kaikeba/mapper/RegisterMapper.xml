@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.mapper.RegisterMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.pojo.Register">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="registerName" jdbcType="VARCHAR" property="registerName" />
+    <result column="idNumber" jdbcType="VARCHAR" property="idNumber" />
+    <result column="regPrice" jdbcType="DOUBLE" property="regPrice" />
+    <result column="medicalNumber" jdbcType="VARCHAR" property="medicalNumber" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="selfPrice" jdbcType="INTEGER" property="selfPrice" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+    <result column="profession" jdbcType="VARCHAR" property="profession" />
+    <result column="lookDoctor" jdbcType="INTEGER" property="lookDoctor" />
+    <result column="department" jdbcType="INTEGER" property="department" />
+    <result column="doctorId" jdbcType="INTEGER" property="doctorId" />
+    <result column="note" jdbcType="VARCHAR" property="note" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, registerName, idNumber, regPrice, medicalNumber, phone, selfPrice, sex, age, 
+    profession, lookDoctor, department, doctorId, note, status
+  </sql>
+  <select id="selectByExample" parameterType="com.kaikeba.pojo.RegisterExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from register
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from register
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from register
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.kaikeba.pojo.RegisterExample">
+    delete from register
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.kaikeba.pojo.Register">
+    insert into register (id, registerName, idNumber, 
+      regPrice, medicalNumber, phone, 
+      selfPrice, sex, age, 
+      profession, lookDoctor, department, 
+      doctorId, note, status
+      )
+    values (#{id,jdbcType=INTEGER}, #{registerName,jdbcType=VARCHAR}, #{idNumber,jdbcType=VARCHAR}, 
+      #{regPrice,jdbcType=DOUBLE}, #{medicalNumber,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{selfPrice,jdbcType=INTEGER}, #{sex,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, 
+      #{profession,jdbcType=VARCHAR}, #{lookDoctor,jdbcType=INTEGER}, #{department,jdbcType=INTEGER}, 
+      #{doctorId,jdbcType=INTEGER}, #{note,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.kaikeba.pojo.Register">
+    insert into register
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="registerName != null">
+        registerName,
+      </if>
+      <if test="idNumber != null">
+        idNumber,
+      </if>
+      <if test="regPrice != null">
+        regPrice,
+      </if>
+      <if test="medicalNumber != null">
+        medicalNumber,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="selfPrice != null">
+        selfPrice,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+      <if test="profession != null">
+        profession,
+      </if>
+      <if test="lookDoctor != null">
+        lookDoctor,
+      </if>
+      <if test="department != null">
+        department,
+      </if>
+      <if test="doctorId != null">
+        doctorId,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="registerName != null">
+        #{registerName,jdbcType=VARCHAR},
+      </if>
+      <if test="idNumber != null">
+        #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="regPrice != null">
+        #{regPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="medicalNumber != null">
+        #{medicalNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="selfPrice != null">
+        #{selfPrice,jdbcType=INTEGER},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+      <if test="profession != null">
+        #{profession,jdbcType=VARCHAR},
+      </if>
+      <if test="lookDoctor != null">
+        #{lookDoctor,jdbcType=INTEGER},
+      </if>
+      <if test="department != null">
+        #{department,jdbcType=INTEGER},
+      </if>
+      <if test="doctorId != null">
+        #{doctorId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.kaikeba.pojo.RegisterExample" resultType="java.lang.Long">
+    select count(*) from register
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update register
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.registerName != null">
+        registerName = #{record.registerName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.idNumber != null">
+        idNumber = #{record.idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.regPrice != null">
+        regPrice = #{record.regPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="record.medicalNumber != null">
+        medicalNumber = #{record.medicalNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null">
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.selfPrice != null">
+        selfPrice = #{record.selfPrice,jdbcType=INTEGER},
+      </if>
+      <if test="record.sex != null">
+        sex = #{record.sex,jdbcType=INTEGER},
+      </if>
+      <if test="record.age != null">
+        age = #{record.age,jdbcType=INTEGER},
+      </if>
+      <if test="record.profession != null">
+        profession = #{record.profession,jdbcType=VARCHAR},
+      </if>
+      <if test="record.lookDoctor != null">
+        lookDoctor = #{record.lookDoctor,jdbcType=INTEGER},
+      </if>
+      <if test="record.department != null">
+        department = #{record.department,jdbcType=INTEGER},
+      </if>
+      <if test="record.doctorId != null">
+        doctorId = #{record.doctorId,jdbcType=INTEGER},
+      </if>
+      <if test="record.note != null">
+        note = #{record.note,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        status = #{record.status,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update register
+    set id = #{record.id,jdbcType=INTEGER},
+      registerName = #{record.registerName,jdbcType=VARCHAR},
+      idNumber = #{record.idNumber,jdbcType=VARCHAR},
+      regPrice = #{record.regPrice,jdbcType=DOUBLE},
+      medicalNumber = #{record.medicalNumber,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      selfPrice = #{record.selfPrice,jdbcType=INTEGER},
+      sex = #{record.sex,jdbcType=INTEGER},
+      age = #{record.age,jdbcType=INTEGER},
+      profession = #{record.profession,jdbcType=VARCHAR},
+      lookDoctor = #{record.lookDoctor,jdbcType=INTEGER},
+      department = #{record.department,jdbcType=INTEGER},
+      doctorId = #{record.doctorId,jdbcType=INTEGER},
+      note = #{record.note,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.pojo.Register">
+    update register
+    <set>
+      <if test="registerName != null">
+        registerName = #{registerName,jdbcType=VARCHAR},
+      </if>
+      <if test="idNumber != null">
+        idNumber = #{idNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="regPrice != null">
+        regPrice = #{regPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="medicalNumber != null">
+        medicalNumber = #{medicalNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="selfPrice != null">
+        selfPrice = #{selfPrice,jdbcType=INTEGER},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=INTEGER},
+      </if>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="profession != null">
+        profession = #{profession,jdbcType=VARCHAR},
+      </if>
+      <if test="lookDoctor != null">
+        lookDoctor = #{lookDoctor,jdbcType=INTEGER},
+      </if>
+      <if test="department != null">
+        department = #{department,jdbcType=INTEGER},
+      </if>
+      <if test="doctorId != null">
+        doctorId = #{doctorId,jdbcType=INTEGER},
+      </if>
+      <if test="note != null">
+        note = #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.pojo.Register">
+    update register
+    set registerName = #{registerName,jdbcType=VARCHAR},
+      idNumber = #{idNumber,jdbcType=VARCHAR},
+      regPrice = #{regPrice,jdbcType=DOUBLE},
+      medicalNumber = #{medicalNumber,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      selfPrice = #{selfPrice,jdbcType=INTEGER},
+      sex = #{sex,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      profession = #{profession,jdbcType=VARCHAR},
+      lookDoctor = #{lookDoctor,jdbcType=INTEGER},
+      department = #{department,jdbcType=INTEGER},
+      doctorId = #{doctorId,jdbcType=INTEGER},
+      note = #{note,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

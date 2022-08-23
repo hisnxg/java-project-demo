@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>药品查询--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        String.prototype.GetValue = function (para) {
+            let reg = new RegExp("(^|&)" + para + "=([^&]*)(&|$)");
+            let r = this.substr(this.indexOf("\?") + 1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+
+        //页面加载时
+        $(function () {
+            loadData();
+            $("#firstPage").click(function () {
+                if (($(this).attr("class")) == 'disabled')
+                    return;
+                let num = $(this).attr("name");
+                $("input[name='pageNum']").val(num);
+                loadData();
+            });
+            $("#prePage").click(function () {
+                if (($(this).attr("class")) == 'disabled')
+                    return;
+                let num = $(this).attr("name");
+                $("input[name='pageNum']").val(num);
+                loadData();
+            });
+            $("#nextPage").click(function () {
+                if (($(this).attr("class")) == 'disabled')
+                    return;
+                let num = $(this).attr("name");
+                $("input[name='pageNum']").val(num);
+                loadData();
+            });
+            $("#lastPage").click(function () {
+                if (($(this).attr("class")) == 'disabled')
+                    return;
+                let num = $(this).attr("name");
+                $("input[name='pageNum']").val(num);
+                loadData();
+            });
+            $('#newNav').click(function () {
+                window.location.href = "add.html";
+            });
+            $("#exportInfo").click(function () {
+                window.location.href='/drug/exportExcel';
+            });
+
+        });
+
+        //填充分页信息
+        function fillPageData(pageInfo) {
+            //填充信息
+            $("#total").html(pageInfo.total);
+            $("#pages").html(pageInfo.pages);
+            $("span[id='pageNum']").val(pageInfo.pageNum);
+            $("select[name='pageSize']").val(pageInfo.pageSize);
+            $("input[name='pageNum']").val(pageInfo.pageNum);
+            //设置按钮的属性值和样式
+            $("#firstPage").attr("name", 1);
+            $("#prePage").attr("name", pageInfo.prePage);
+            $("#nextPage").attr("name", pageInfo.nextPage);
+            $("#lastPage").attr("name", pageInfo.pages);
+            $("#firstPage").removeClass("disabled");
+            $("#prePage").removeClass("disabled");
+            $("#nextPage").removeClass("disabled");
+            $("#lastPage").removeClass("disabled");
+            if (pageInfo.isFirstPage) {//如果是第一页：上一页和首页禁用
+                $("#firstPage").addClass("disabled");
+                $("#prePage").addClass("disabled");
+            }
+            if (pageInfo.isLastPage) {//如果已经是最后一页：下一页和末页禁用
+                $("#nextPage").addClass("disabled");
+                $("#lastPage").addClass("disabled");
+            }
+        }
+
+        //加载数据
+        function loadData(){
+            let url = document.location.toString();
+            let pageNum = url.GetValue("pageNum");
+            let pageSize = url.GetValue("pageSize");
+            if (pageNum != null && $("input[name='pageNum']").val() != null) {
+                $("input[name='pageNum']").val(pageNum);
+            }
+            if (pageSize != null && $("select[name='pageSize']").val() != null) {
+                $("select[name='pageSize']").val(pageSize);
+            }
+            $.ajax({
+                type:"GET",
+                url:"/drug/list",
+                data:$("#myForm").serialize(),
+                dataType:"json",
+                success: function(vo){
+                    let list = vo.pageInfo.list;
+                    let str="";
+                    for (let i = 0; i < list.length; i++) {
+                        let obj = list[i];
+                        let id = obj.id;
+                        let drugName = obj.drugName;
+                        let drugType = obj.drugType==null?'':obj.drugType;
+                        let description = obj.description==null?'':obj.description;
+                        let status = obj.status===0?'销售中':'售完';
+                        let resetNumber = obj.resetNumber;
+                        str+='<tr>\n' +
+                            '            <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>\n' +
+                            '            <td style="vertical-align:middle;">'+id+'</td>\n' +
+                            '            <td style="vertical-align:middle;">'+drugName+'</td>\n' +
+                            '            <td style="vertical-align:middle;">'+drugType+'</td>\n' +
+                            '            <td style="vertical-align:middle;">'+description+'</td>\n' +
+                            '            <td style="vertical-align:middle;">'+status+'</td>\n' +
+                            '            <td style="vertical-align:middle;">'+resetNumber+'</td>\n' +
+                            '            <td style="vertical-align:middle;">\n' +
+                            '                <a href="update.html?id='+id+'">更改</a>&nbsp;&nbsp;&nbsp;\n' +
+                            '                <a href="add_medicine.html?id='+id+'">添加库存</a>&nbsp;&nbsp;&nbsp;\n' +
+                            '                <a href="look.html?id='+id+'">详情>>></a>&nbsp;&nbsp;&nbsp;\n' +
+                            '                <a href="uploadLogo.html?drugId='+id+'">图片上传</a>\n' +
+                            '            </td>\n' +
+                            '        </tr>'
+                    }
+                    $("#tbody").html(str);
+                    //填充分页数据
+                    fillPageData(vo.pageInfo);
+                }
+            });
+        }
+
+        //全选
+        function checkall() {
+            var alls = document.getElementsByName("check");
+            var ch = document.getElementById("checkall");
+            if (ch.checked) {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = true;
+                }
+            } else {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = false;
+                }
+            }
+        }
+
+    </script>
+</head>
+<body>
+
+<form id="myForm" action="index.html" method="get" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td width="10%" class="tableleft">药品名称：</td>
+            <td>
+                <input type="text" name="drugName" value=""/></td>
+            <td width="10%" class="tableleft">药品类型：</td>
+            <td>
+            <select name="drugType">
+                <option value="">请选择药品类型</option>
+                <option value="中药">中药</option>
+                <option value="西药">西药</option>
+                <option value="处方">处方</option>
+                <option value="非处方">非处方</option>
+            </select></td>
+        </tr>
+        <tr>
+            <td width="10%" class="tableleft">页号：</td>
+            <td><input type="text" class="abc input-default" placeholder="" name="pageNum" value="1"/> &nbsp;</td>
+            <td width="10%" class="tableleft">单页条数：</td>
+            <td><select class="form-control" name="pageSize">
+                <option value="5" selected="selected">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+            </select> &nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <center>
+                    <button name="query" onclick="loadData()" class="btn btn-primary" type="button">查询</button>
+                    <button class="btn btn-primary" type="reset">清空</button>
+                </center>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>药品编号</th>
+        <th>药品名称</th>
+        <th>药品类型</th>
+        <th>简单描述</th>
+        <th>状态</th>
+        <th>剩余量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="tbody">
+        <tr>
+            <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">J1121</td>
+            <td style="vertical-align:middle;">感冒药</td>
+            <td style="vertical-align:middle;">处方</td>
+            <td style="vertical-align:middle;">用于普通感冒</td>
+            <td style="vertical-align:middle;">销售中</td>
+            <td style="vertical-align:middle;">1000袋</td>
+            <td style="vertical-align:middle;">
+                <a href="add.html">更改</a>&nbsp;&nbsp;&nbsp;
+                <a href="add_medicine.html">添加库存</a>&nbsp;&nbsp;&nbsp;
+                <a href="look.html">详情>>></a>
+            </td>
+        </tr>
+    </tbody>
+
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="ppp">
+                <span name="page1" id="firstPage"><a href="javascript:void(0)">第一页</a></span>
+                <span name="page2" id="prePage"><a href="javascript:void(0)">上一页</a></span>
+                <span name="page3" id="nextPage"><a href="javascript:void(0)">下一页</a></span>
+                <span name="page4" id="lastPage"><a href="javascript:void(0)">最后一页</a></span>
+                共<span  id="total"></span> 条记录 <span id="pageNum">1</span> /<span id="pages">1</span>页</div>
+                <div>
+                    <button type="button" class="btn btn-success" id="newNav">添加新药</button>
+                    <button type="button" class="btn btn-success" id="exportInfo">导出Excel</button>
+                </div>
+            </div>
+        </th>
+    </tr>
+</table>
+
+</body>
+</html>

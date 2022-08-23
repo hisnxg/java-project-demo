@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form action="#" method="post" class="definewidth m20" >
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">角色名称</td>
+        <td><input type="text" name="rolename" readonly="readonly"  value="管理员"/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">状态</td>
+        <td>
+            <input type="radio" name="status" value="1" checked /> 启用
+           <input type="radio" name="status" value="0"  /> 禁用
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft">权限</td>
+        <td>
+		<ul><label class='checkbox inline'><input type='checkbox'  name='group' value='1' />挂号信息管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'   name='group' value='2' />住院办理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'   name='group' value='3' />住院结算</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'  name='group' value='4' />在院发药</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'   name='group' value='5' />药品管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'  name='group' value='6' />检查收费项目登记</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'   name='group' value='7' />收费项目管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox'  name='group' value='8' />门诊医生管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox' name='group' value='9' />用户管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox' name='group' value='10' />角色管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox' name='group' value='11' />资源管理</label></ul>
+                <ul><label class='checkbox inline'><input type='checkbox' name='group' value='12' />密码管理</label></ul>
+		</td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+            <input class="btn btn-primary" type="button" value="更新"onclick="genxin()"/>&nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+<script>
+    $(function () {
+       $(':checkbox[name="group[]"]').click(function () {
+            $(':checkbox', $(this).closest('li')).prop('checked', this.checked);
+
+        });
+
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+        let rId = window.location.href.split("?")[1].split("=")[1];
+        $.ajax({
+            url: "http://localhost:8080/role/selectRoleById",
+            data: {
+                'roleId': rId,
+            },
+            type: 'POST',
+            dataType: 'json',
+            success: function (response) {
+
+                let role = response.data.role;
+                let roleMenu=response.data.roleMenu;
+                $.each(roleMenu,function(index,rolemenu){
+                    $("input[name='group'][value='"+rolemenu.mId+"']").attr("checked", true);
+                });
+                $("input[name='rolename']").val(role.rName);
+               // $("input[name='status']").val(role.rState);
+                $("[name='status'][value='role.rState']").prop("checked", "checked");
+
+            }
+        })
+    });
+    function genxin(){
+        var roleName = $("input[name='rolename']").val();
+        var rolestate = $("input[name='status']:checked").val();
+        var ids = [];
+        $("input[name='group']:checked").each(function(i){
+                            ids.push($(this).val());
+        })
+        initData(roleName,rolestate,ids);
+    }
+    function initData(roleName,rolestate,ids){
+        console.log(roleName);
+        console.log(rolestate);
+        console.log(ids);
+        $.ajax({
+            url: "http://localhost:8080/role/upDateRole",
+            data: {'roleName':roleName,'state':rolestate,'rmIds':ids},
+            type: 'post',
+            dataType: 'json',
+            traditional: true,
+            success: function (data){
+                let flag = data.flag;
+                if(flag){
+                    alert("添加成功");
+                    window.location.href = "index.html";
+                }else
+                {
+                    alert("添加失败");
+                }
+
+            }
+        });
+    }
+</script>

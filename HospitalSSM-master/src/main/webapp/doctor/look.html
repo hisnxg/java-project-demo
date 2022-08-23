@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>查看--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+
+        let doctorId = window.location.href.split("?")[1].split("=")[1];
+
+        //console.log(doctorId);
+        //发送ajax请求
+        $.ajax({
+            url: "queryDoctorByName",
+            data: {'doctorId':doctorId,},
+            type: 'GET',
+            dataType: 'json',
+            success:function (resp){
+                if (resp.response.flag){
+                    let doctor = resp.data.doctor;
+                    var dId = $("#dId").text(doctor.dId);
+                    var dName = $("#dName").text(doctor.dName);
+                    var dIdcar = $("#dIdcar").text(doctor.dIdcar);
+                    var dPhone = $("#dPhone").text(doctor.dPhone);
+                    var dTelphone = $("#dTelphone").text(doctor.dTelphone);
+                    var dSex = $("#dSex").text(sexfo(doctor.dSex));
+                    var dBirthday = $("#dBirthday").text(formDate(doctor.dBirthday));
+                    var dAge = $("#dAge").text(doctor.dAge);
+                    var dEmail = $("#dEmail").text(doctor.dEmail);
+                    var dKeshi = $("#dKeshi").text(doctor.dKeshi);
+                    var dXueli = $("#dXueli").text(doctor.dXueli);
+                    var dDesc = $("#dDesc").text(doctor.dDesc);
+                    //获取身份证号
+                    //changeIdCar(doctor.dIdcar)
+                }
+            }
+        })
+    });
+    function formDate(toDate){
+        var date= new Date(toDate);
+        var year=date.getFullYear(); //获取当前年份
+        var mon=date.getMonth()+1; //获取当前月份
+        var da=date.getDate(); //获取当前日
+        var day=date.getDay(); //获取当前星期几
+        var h=date.getHours(); //获取小时
+        var m=date.getMinutes(); //获取分钟
+        var s=date.getSeconds(); //获取秒
+        var d=document.getElementById('Date');
+        return year+'-'+mon+'-'+da;
+    }
+    function sexfo(sex){
+        if (sex==1){
+            return "女";
+        }else {
+            return "男";
+        }
+    }
+    function formDate(toDate){
+        var date= new Date(toDate);
+        var year=date.getFullYear(); //获取当前年份
+        var mon=date.getMonth()+1; //获取当前月份
+        var da=date.getDate(); //获取当前日
+        var day=date.getDay(); //获取当前星期几
+        var h=date.getHours(); //获取小时
+        var m=date.getMinutes(); //获取分钟
+        var s=date.getSeconds(); //获取秒
+        var d=document.getElementById('Date');
+        return year+'-'+mon+'-'+da;
+    }
+    </script>
+</head>
+<body>
+<form action="../../index.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td id="dId">程俊</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件类型</td>
+        <td id="dName">护照</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件号</td>
+        <td id="dIdcar">534534534</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">手机</td>
+        <td id="dPhone">13124345432</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">座机</td>
+        <td id="dTelphone">01068765432</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">性别</td>
+        <td id="dSex">男</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">年龄</td>
+        <td id="dAge">28</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">出生年月</td>
+        <td id="dBirthday">1981-09-04</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">电子邮箱</td>
+        <td id="dEmail">chengjun@msn.com.cn</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">所属科室</td>
+        <td id="dKeshi">急诊科</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">学历</td>
+        <td id="dXueli">本科</td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td id="dDesc">工作热情积极表现非常的优异</td>
+	</tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>发药--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="dispensing.html";
+		 });
+
+        let hosrId = window.location.href.split("?")[1].split("=")[1];
+
+        getMsg(hosrId);
+    });
+
+    //获取挂号信息
+    function getMsg(hosrId) {
+        //发送ajax请求
+        $.ajax({
+            url: "selectBeHospitalStateById",
+            data: {'hosrId': hosrId},
+            type: 'get',
+            dataType: 'json',
+            success: function (data) {
+                let rig = data.data.totalMsg;
+
+                if(data.data.totalMsg == null || data.data.totalMsg == ''){
+                    alert("该挂号id不存在");
+                    return ;
+                }
+
+                if (rig.primaryStatus==2){
+                    alert("该挂号id已退号");
+                    return ;
+                }
+
+                //挂号信息回显数据
+                $("#hosrName").text(rig.hosrName);
+                $("#hosrId").text(rig.hosrId);
+
+                getDrug();
+            }
+        });
+    }
+
+    function getDrug(){
+        $.ajax({
+            url: "http://localhost:8080/medicine/queryDrug",
+            data: {"pageNum":1,'pageSize':10000},
+            type: 'get',
+            dataType: 'json',
+            success: function (data){
+                //清空下级标签
+                $("#drug").empty();
+                let page = data.data.drugPage;
+                let param = data.data.param;
+                let list = page.list;
+                //遍历数据
+                $.each(list,function (index,drug){
+                    $("#drug").append("<option value='"+drug.drId+"'>"+drug.drName+"</option>");
+                })
+            }
+        });
+    }
+
+    function baocun(){
+
+        let hosrId = $("#hosrId").text();
+        let drugNum = $("#drugNum").val();
+        let drugId = $("#drug").val();
+
+        console.log(drugId);
+
+        if (drugNum==null || drugNum == ''){
+            alert("数量为空");
+            return;
+        }
+
+        if (isNaN(drugNum)) {
+            alert("请输入数字");
+            return ;
+        }
+
+        $.ajax({
+            url: "addSendMedicine",
+            data: {"peopleId":hosrId,'drId':drugId,'drNumber':drugNum},
+            type: 'post',
+            dataType: 'json',
+            success: function (data){
+                if (data.response.flag){
+                    window.location.href = "dispensing.html";
+                }else {
+                    alert("添加失败")
+                }
+            }
+        });
+    }
+
+    function kucun(){
+        //查询库存
+        let drudId = $("#drug").val();
+        let drugNum = $("#drugNum").val();
+
+        if (isNaN(drugNum)) {
+            alert("请输入数字");
+            $("#drugNum").val("");
+            return ;
+        }
+
+        if (drugNum < 0){
+            alert("请输入正数");
+            $("#drugNum").val("");
+            return;
+        }
+
+        let ids = window.location.href.split("?")[1].split("=")[1].split(",");
+        console.log("长度"+ids.length)
+
+        $.ajax({
+            url: "http://localhost:8080/medicine/queryDrugById",
+            data: {"drugId":drudId},
+            type: 'get',
+            dataType: 'json',
+            success: function (data){
+                if (data.response.flag){
+                    let num = ids.length;
+                    let totalNum =  drugNum*(num)
+                    if ((data.data.drug.drNumber) < (drugNum * num)){
+                        alert("发药数量【"+totalNum+"】大于库存，【"+data.data.drug.drName+"】库存为"+data.data.drug.drNumber)
+                        $("#drugNum").val("");
+                    }
+                }else {
+                    alert("查询失败，请重试！");
+                }
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+<form action="dispensing.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td id="hosrId">1101</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td id="hosrName">黄飞鸿</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td>
+            <select id="drug">
+                <option>2304-九九感冒药</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">发药数量</td>
+        <td><input id="drugNum" type="text" name="drugNum" value="" onchange="kucun()"/></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<input class="btn btn-primary" type="button" onclick="baocun()" value="保存"/> &nbsp;&nbsp;
+                <input type="button" class="btn btn-success" name="backid" id="backid" value="返回列表"/>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

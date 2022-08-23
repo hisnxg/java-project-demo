@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>录入住院信息--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+
+        let hosrId = window.location.href.split("?")[1].split("=")[1];
+
+        var yajin = 0;
+
+        //发送ajax请求
+        $.ajax({
+            url: "selectBeHospitalStateById",
+            data: {'hosrId':hosrId,},
+            type: 'get',
+            dataType: 'json',
+            success:function (data){
+                if (data.response.flag){
+                    let rig = data.data.totalMsg;
+                    $("#hosrName").text(rig.hosrName);
+                    $("#hosrId").text(rig.hosrId);
+                    yajin = rig.behAntecedent
+                    $("#hosrIdcar").text(rig.hosrIdcar);
+
+                    //请求花费多少
+                    $.ajax({
+                        url: "selectBehospitalById",
+                        data: {'hosrId':hosrId,},
+                        type: 'post',
+                        dataType: 'json',
+                        success:function (data){
+                            if (data.response.flag){
+                                console.log();
+                                $("#yue").text(yajin-(data.data.cost));
+                            }
+                        }
+                    });
+                }
+            }
+        })
+
+    });
+
+    //校验押金
+    function baocun(){
+        let money = $("input[name='money']").val();
+        let hosrId = $("#hosrId").text();
+        //请求花费多少
+        $.ajax({
+            url: "updateBeHospitalPrice",
+            data: {'hosrId':hosrId,'price':money},
+            type: 'GET',
+            dataType: 'json',
+            success:function (data){
+                if (data.response.flag){
+                    window.location.href = "index.html"
+                }
+            }
+        })
+    }
+    </script>
+</head>
+<body>
+<form action="../../index.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号</td>
+        <td id="hosrId">1103</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">姓名</td>
+        <td id="hosrName">黄飞鸿</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">证件号</td>
+        <td id="hosrIdcar">42068325467876</td>
+    </tr>
+	
+	<tr>
+        <td width="10%" class="tableleft">余额</td>
+        <td id="yue">200元</td>
+    </tr>
+	
+    <tr>
+        <td width="10%" class="tableleft">缴费押金</td>
+        <td><input type="text" name="money" value=""/>元</td>
+    </tr>
+
+    <tr>
+        <td colspan="2">
+			<center>
+				<input class="btn btn-primary" type="button" value="保存" onclick="baocun()"/> &nbsp;&nbsp;
+                <input type="button" class="btn btn-success" name="backid" id="backid" value="返回列表"/>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

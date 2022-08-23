@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.kkb.bean.User">
+    <id column="u_id" jdbcType="INTEGER" property="uId" />
+    <result column="u_loginName" jdbcType="VARCHAR" property="uLoginname" />
+    <result column="u_password" jdbcType="VARCHAR" property="uPassword" />
+    <result column="u_trueName" jdbcType="VARCHAR" property="uTruename" />
+    <result column="u_email" jdbcType="VARCHAR" property="uEmail" />
+    <result column="u_state" jdbcType="INTEGER" property="uState" />
+    <result column="r_id" jdbcType="INTEGER" property="rId" />
+
+    <association property="role" javaType="com.kkb.bean.Role">
+      <id column="r_id" property="rId"/>
+      <result column="r_name" property="rName"/>
+      <result column="r_state" property="rState"/>
+    </association>
+
+  </resultMap>
+
+<!--根据用户名称模糊查询所有-->
+  <select id="selectUserByParam" resultMap="BaseResultMap">
+    select u_loginName ,u_trueName,u_state,role.r_name,u_id
+    from user ,role
+    where
+    user.r_id = role.r_id
+    <if test="userName!=null and userName!=''">
+      and u_loginName like concat('%',#{userName},'%')
+    </if>
+
+  </select>
+
+  <select id="selectUserPassword" parameterType="User" resultType="java.lang.String">
+    select u_password from user where u_id = #{uId};
+  </select>
+
+  <select id="selectUserLogin" resultType="java.lang.Integer" parameterType="User">
+        select u_id from user where u_loginName = #{uLoginname} AND u_password = #{uPassword}
+  </select>
+
+
+  <select id="updateUserPassword"    parameterType="User">
+    UPDATE user SET u_password = #{uPassword} WHERE u_id = #{uId}
+  </select>
+
+  <select id="selectUserState" resultType="java.lang.Integer" parameterType="User">
+    select u_state from user where u_id=#{uId}
+  </select>
+
+  <sql id="Base_Column_List">
+    u_id, u_loginName, u_password, u_trueName, u_email, u_state, r_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where u_id = #{uId,jdbcType=INTEGER}
+  </select>
+  <select id="selectUserById" resultType="int"  resultMap="BaseResultMap">
+    select u_loginName,u_password,u_trueName,u_email,u_state,r_name
+     from  user ,role where u_id =#{i} AND user.r_id=role.r_id
+  </select>
+  <select id="selectUserByName" parameterType="com.kkb.vo.usermanager.req.SelectUserReq" resultMap="BaseResultMap">
+    select * from user where u_loginName=#{userName}
+  </select>
+
+
+  <!--根据ids删除-->
+  <delete id="deleteByUserIds" parameterType="com.kkb.vo.usermanager.req.DeleteMoreUserReq">
+    delete from user where u_id in
+    <foreach collection="deleteMoreUserReq.userIds" item="userIds" open="(" close=")" separator=",">
+      #{userIds}
+    </foreach>
+  </delete>
+
+
+
+  <delete id="deleteByUserId" parameterType="int">
+    delete from user
+    where u_id = #{uId}
+
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.kkb.bean.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="uId != null">
+        u_id,
+      </if>
+      <if test="uLoginname != null">
+        u_loginName,
+      </if>
+      <if test="uPassword != null">
+        u_password,
+      </if>
+      <if test="uTruename != null">
+        u_trueName,
+      </if>
+      <if test="uEmail != null">
+        u_email,
+      </if>
+      <if test="uState != null">
+        u_state,
+      </if>
+      <if test="rId != null">
+        r_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="uId != null">
+        #{uId,jdbcType=INTEGER},
+      </if>
+      <if test="uLoginname != null">
+        #{uLoginname,jdbcType=VARCHAR},
+      </if>
+      <if test="uPassword != null">
+        #{uPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="uTruename != null">
+        #{uTruename,jdbcType=VARCHAR},
+      </if>
+      <if test="uEmail != null">
+        #{uEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="uState != null">
+        #{uState,jdbcType=INTEGER},
+      </if>
+      <if test="rId != null">
+        #{rId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.User">
+    update user
+    <set>
+      <if test="uLoginname != null">
+        u_loginName = #{uLoginname,jdbcType=VARCHAR},
+      </if>
+      <if test="uPassword != null">
+        u_password = #{uPassword,jdbcType=VARCHAR},
+      </if>
+      <if test="uTruename != null">
+        u_trueName = #{uTruename,jdbcType=VARCHAR},
+      </if>
+      <if test="uEmail != null">
+        u_email = #{uEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="uState != null">
+        u_state = #{uState,jdbcType=INTEGER},
+      </if>
+      <if test="rId != null">
+        r_id = #{rId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where u_id = #{uId,jdbcType=INTEGER}
+
+
+  </update>
+  <!-- 根据名称改用户信息-->
+  <update id="updateByPrimaryKey" parameterType="com.kkb.vo.usermanager.req.EditUserReq" >
+    update user
+    set
+      u_password = #{passWord},
+      u_email = #{email},
+      u_state = #{state},
+      r_id=#{roleId}
+      where   u_trueName = #{trueName}
+  </update>
+
+
+
+  <!--根据前台返回数据添加用户-->
+  <insert id="insertUser" parameterType="com.kkb.vo.usermanager.req.AddUserReq">
+      insert into user (u_loginName, u_password,
+                        u_trueName, u_email, u_state,r_id
+    )
+    values (#{userName},#{passWord},#{trueName},#{email},#{ustate},#{roleId})
+  </insert>
+
+</mapper>

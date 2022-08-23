@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="copy(title)">
+    &copy; 2020 开课吧版权所有<br>
+    <span th:text="${title}">title footer</span>
+</footer>
+<h5>thymeleaf布局</h5>
+<div th:insert="footer :: copy('开课吧1')"></div>
+<div th:replace="footer :: copy('开课吧2')"></div>
+<div th:include="footer :: copy('开课吧3')"></div>
+</body>
+</html>

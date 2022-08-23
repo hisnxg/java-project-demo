@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>修改医生--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+    $(function () {       
+		$('#backid').click(function(){
+				window.location.href="index.html";
+		 });
+
+		let doctorId = window.location.href.split("?")[1].split("=")[1];
+
+		//console.log(doctorId);
+        //发送ajax请求
+        $.ajax({
+            url: "queryDoctorByName",
+            data: {'doctorId':doctorId,},
+            type: 'GET',
+            dataType: 'json',
+            success:function (resp){
+                if (resp.response.flag){
+                    $("#xunhuan").empty();
+                    let doctor = resp.data.doctor;
+                    var dId = $("input[name='dId']").val(doctor.dId);
+                    var dName = $("input[name='dName']").val(doctor.dName);
+                    var dIdcar = $("input[name='dIdcar']").val(doctor.dIdcar);
+                    var dPhone = $("input[name='dPhone']").val(doctor.dPhone);
+                    var dTelphone = $("input[name='dTelphone']").val(doctor.dTelphone);
+                    //var dSex = $("input[name='dSex']").val(doctor.dSex);
+                    //var dBirthday = $("input[name='dBirthday']").val(doctor.dBirthday);
+                    //var dAge = $("input[name='dAge']").val(doctor.dAge);
+                    var dEmail = $("input[name='dEmail']").val(doctor.dEmail);
+                    var dKeshi = $("#dKeshi").val(doctor.dKeshi);
+                    var dXueli = $("#dXueli").val(doctor.dXueli);
+                    var dDesc = $("#dDesc").val(doctor.dDesc);
+                    //获取身份证号
+                    changeIdCar(doctor.dIdcar)
+                }
+            }
+        })
+    });
+
+    function formDate(toDate){
+        var date= new Date(toDate);
+        var year=date.getFullYear(); //获取当前年份
+        var mon=date.getMonth()+1; //获取当前月份
+        var da=date.getDate(); //获取当前日
+        var day=date.getDay(); //获取当前星期几
+        var h=date.getHours(); //获取小时
+        var m=date.getMinutes(); //获取分钟
+        var s=date.getSeconds(); //获取秒
+        var d=document.getElementById('Date');
+        return year+'-'+mon+'-'+da;
+    }
+
+    // F 女 , M 男 (female 女,male 男)
+    function getSexByIdNO(IdNO) {
+        if (IdNO.length == 18) {
+            return IdNO.charAt(16) % 2 == 0 ? "F" : "M";
+        } else if (IdNO.length == 15) {
+            return IdNO.charAt(14) % 2 == 0 ? "F" : "M";
+        } else {
+            return "";
+        }
+    }
+
+    //获取年月日
+    function getBirthdayByIdNO(IdNO) {
+        let birthday = "";
+        if (IdNO.length == 18) {
+            birthday = IdNO.substr(6, 8);
+            return birthday.replace(/(.{4})(.{2})/, "$1-$2-");
+        } else if (IdNO.length == 15) {
+            birthday = "19" + IdNO.substr(6, 6);
+            return birthday.replace(/(.{4})(.{2})/, "$1-$2-");
+        } else {
+            return "";
+        }
+    }
+    //获取年龄
+    function getAge(userCard){
+        //获取年龄
+        var yearBirth = userCard.substring(6,10);
+        var monthBirth = userCard.substring(10,12);
+        var dayBirth = userCard.substring(12,14);
+        //获取当前年月日并计算年龄
+        var myDate = new Date();
+        var monthNow = myDate.getMonth() + 1;
+        var dayNow = myDate.getDay();
+        var age = myDate.getFullYear() - yearBirth;
+        if(monthNow < monthBirth || (monthNow == monthBirth && dayNow < dayBirth)){
+            age--;
+        }
+        // let nowYear = new Date(),getFullYear;
+        // let my =  getBirthdayByIdNO(userCard).split("-")[0]
+        return age;
+    }
+
+    function changeIdCar(){
+        let dIdcar = $("input[name='dIdcar']").val();
+        //身份证号验证
+        if (dIdcar == null || dIdcar == '') {
+            alert("名字为空");
+            return;
+        } else {
+            var myreg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+            if (!myreg.test(dIdcar)) {
+                alert("身份证格式不正确")
+                $("input[name='dIdcar']").val("");
+                return;
+            }
+        }
+        //获取性别
+        let sexBox = $("input[name='dSex']");
+        if (sexBox!=''){
+            if (getSexByIdNO(dIdcar)=='M'){
+                $("input[name='dSex'][value='1']").attr({"checked":"checked"})
+            }else {
+                $("input[name='dSex'][value='2']").attr({"checked":"checked"})
+            }
+        }else {
+            console.log("获取性别失败")
+        }
+        //获取年月日
+        let bir = $("input[name='dBirthday']");
+        bir.val(getBirthdayByIdNO(dIdcar))
+        //获取年龄
+        $("input[name='dAge']").val(getAge(dIdcar));
+    }
+
+    function mybaocun() {
+        var dId = $("input[name='dId']").val();
+        var dName = $("input[name='dName']").val();
+        var dIdcar = $("input[name='dIdcar']").val();
+        var dPhone = $("input[name='dPhone']").val();
+        var dTelphone = $("input[name='dTelphone']").val();
+        var dSex = $("input[name='dSex']").val();
+        var dBirthday = $("input[name='dBirthday']").val();
+        var dAge = $("input[name='dAge']").val();
+        var dEmail = $("input[name='dEmail']").val();
+        var dKeshi = $("#dKeshi").val();
+        var dXueli = $("#dXueli").val();
+        var dDesc = $("#dDesc").val();
+
+        //数据验证
+        if (dName == null || dName == '') {
+            alert("名字为空");
+            return;
+        }
+        //手机号验证
+        if (dPhone == null || dPhone == '') {
+            alert("手机号为空");
+            return;
+        } else {
+            let myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+            if (!myreg.test(dPhone)) {
+                alert("手机号格式不正确!");
+                return;
+            }
+        }
+        //座机验证
+        // if (dTelphone == null || dTelphone == '') {
+        //     alert("座机为空");
+        //     return;
+        // } else {
+        //     let myreg = /^0\d{2,3}-?\d{7,8}$/;
+        //     if (!myreg.test(dTelphone)) {
+        //         alert("座机格式不正确!");
+        //         return;
+        //     }
+        // }
+        //邮箱验证
+        if (dEmail == null || dEmail == '') {
+            alert("邮箱为空");
+            return;
+        } else {
+            let myreg = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+            if (!myreg.test(dEmail)) {
+                alert("邮箱格式不正确!");
+                return;
+            }
+        }
+
+        //发送ajax请求
+        $.ajax({
+            url: "http://localhost:8080/doctor/updateDoctor",
+            data: {
+                'dId':dId,
+                'dName':dName,
+                'dIdcar':dIdcar,
+                'dPhone':dPhone,
+                'dTelphone':dTelphone,
+                'dSex':dSex,
+                'dBirthday':dBirthday,
+                'dAge':dAge,
+                'dEmail':dEmail,
+                'dKeshi':dKeshi,
+                'dXueli':dXueli,
+                'dDesc':dDesc
+            },
+            type: 'POST',
+            //contentType: "application/json;charset=UTF-8",
+            dataType: 'json',
+            success:function (resp){
+                if (resp.response.flag){
+                    window.location.href = "index.html";
+                }
+            }
+        })
+    }
+    </script>
+</head>
+<body>
+<form action="../../index.html" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <input type="hidden" name="dId"/>
+        <td width="10%" class="tableleft">姓名</td>
+        <td><input type="text" name="dName" value="程俊"/></td>
+    </tr>
+    
+    <tr>
+        <td width="10%" class="tableleft">身份证号</td>
+        <td><input type="text" name="dIdcar" value="" onchange="changeIdCar()"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">手机</td>
+        <td><input type="text" name="dPhone" value="15343457897"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">座机</td>
+        <td><input type="text" name="dTelphone" value="01088586875"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">性别</td>
+        <td><input disabled type="radio" name="dSex" value="1" checked/>男&nbsp;&nbsp;&nbsp;
+            <input disabled type="radio" name="dSex" value="2"/>女</td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">出生年月</td>
+        <td><input disabled type="text" name="dBirthday" value="1986-09-06"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">年龄</td>
+        <td><input disabled type="text" name="dAge"></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">电子邮箱</td>
+        <td><input type="text" name="dEmail" value="chengjun@msn.com.cn"/></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">所属科室</td>
+        <td><select id="dKeshi" name="dKeshi">
+            <option value="急诊科">急诊科</option>
+            <option value="骨科">骨科</option>
+            <option value="血液科">血液科</option>
+        </select></td>
+    </tr>
+    <tr>
+        <td width="10%" class="tableleft">学历</td>
+        <td><select id="dXueli" name="dXueli">
+            <option value="专科">专科</option>
+            <option value="本科">本科</option>
+            <option value="博士">博士</option>
+            <option value="博士后">博士后</option>
+        </select></td>
+    </tr>
+	<tr>
+        <td width="10%" class="tableleft">备注</td>
+        <td><textarea id="dDesc" name="dDesc">此人表现优异工作非常的积极！</textarea></td>
+	</tr>
+    <tr>
+        <td colspan="2">
+			<center>
+				<input class="btn btn-primary" type="button" onclick="mybaocun()" value="保存"/> &nbsp;&nbsp;
+                <input type="button" class="btn btn-success" name="backid" id="backid" value="返回列表"/>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

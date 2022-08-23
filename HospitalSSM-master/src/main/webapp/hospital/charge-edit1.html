@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加收费项目</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#backid').click(function () {
+                window.location.href = "charge.html";
+            });
+        });
+
+        //查重
+        function chachong() {
+            let chapName = $("#chapName").val();
+            $.ajax({
+                url: 'chachong',
+                data: {'chapName': chapName},
+                type: 'post',
+                datatype: 'json',
+                success: function (data) {
+                    console.log(data.data.chargeproject)
+                    if (data.data.chargeproject == '' || data.data.chargeproject == null) {
+
+                    } else {
+                        console.log("名字重复");
+                        alert("名字重复");
+                        $("#chapName").val("");
+                    }
+                }
+            })
+        }
+
+        function shuziyanzheng() {
+            console.log("sfdsdsdf")
+            let chapMoney = $("#chapMoney").val();
+
+            if (chapMoney < 0) {
+                alert("请输入正数");
+                $("#chapMoney").val("");
+            }
+            if (isNaN(chapMoney)) {
+                alert("请输入数字");
+                $("#chapMoney").val("");
+
+            }
+        }
+    </script>
+</head>
+<body>
+<form action="charge.html" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <input type="hidden" id="id" name="id">
+            <td width="10%" class="tableleft">收费项目名称</td>
+            <td><input id="chapName" type="text" name="chapName" onblur="" onchange="chachong()"/></td>
+        </tr>
+
+        <tr>
+            <td width="10%" class="tableleft">收费金额</td>
+            <td><input id="chapMoney" type="text" name="chapMoney" nonce="chapMoney" onchange="shuziyanzheng()"/></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <center>
+                    <input type="button" class="btn btn-primary" type="button" onclick="mybaocun()" value="保存"/> &nbsp;&nbsp;
+                    <input type="button" class="btn btn-success" name="backid" id="backid" value="返回列表"/>
+                </center>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#backid').click(function () {
+            window.location.href = "charge.html";
+        });
+
+        console.log(window.location.href.indexOf("?") == -1)
+        //判断是否存在参数
+        if (window.location.href.indexOf("?") == -1) {
+
+        } else {
+            let flag = window.location.href.split("_")[1];
+            let id = window.location.href.split("?")[1].split("=")[1].split("_")[0];
+
+            if (flag == 1) {
+                $.ajax({
+                    url: "selectByChapId",
+                    data: {
+                        'chapId': id,
+                    },
+                    type: 'POST',
+                    //contentType: "application/json;charset=UTF-8",
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.response.flag) {
+                            let shuju = response.data;
+                            $("#chapName").val(shuju.chapName);
+                            $("#chapMoney").val(shuju.chapMoney);
+                            $("#id").val(shuju.chapId);
+                        } else {
+                            alert("查询失败，请重试！");
+                        }
+                    }
+                })
+                //设置为不可用
+                $("#bc").attr({"disabled": "disabled"})
+
+            } else if (flag == 2) {
+                $.ajax({
+                    url: "selectByChapId",
+                    data: {
+                        'chapId': id,
+                    },
+                    type: 'POST',
+                    //contentType: "application/json;charset=UTF-8",
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.response.flag) {
+                            let shuju = response.data;
+                            $("#chapName").val(shuju.chapName);
+                            $("#chapMoney").val(shuju.chapMoney);
+                            $("#id").val(shuju.chapId);
+                        } else {
+                            alert("查询失败，请重试！");
+                        }
+                    }
+                })
+            }
+        }
+
+
+    });
+
+    function mybaocun() {
+        let id = $("input[name=id]").val();
+        console.log(id);
+        var chapName = $("input[name='chapName']").val();
+        var chapMoney = $("input[name='chapMoney']").val();
+
+        //收费项目验证
+        if (chapName == null || chapName == '') {
+            alert("收费项目不能为空");
+            return;
+        }
+        //金钱验证
+        if (chapMoney == null || chapMoney == '') {
+            alert("钱数不能为空");
+            return;
+        } else {
+            if (isNaN(chapMoney)) {
+                alert("请输入数字");
+                return;
+            }
+        }
+
+        //如果是添加的话
+        if (window.location.href.indexOf("?") == -1) {
+            $.ajax({
+                url: "/hospital/addchargeproject",
+                data: {
+                    'chapName': chapName,
+                    'chapMoney': chapMoney
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        window.location.href = "charge.html";
+                    } else {
+                        alert("添加失败，请重试！");
+                    }
+                }
+            })
+        } else {//修改
+            //发送ajax请求
+            $.ajax({
+                url: "/hospital/updateByPrimaryKeySelective",
+                data: {
+                    'chapId': id,
+                    'chapName': chapName,
+                    'chapMoney': chapMoney
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        window.location.href = "charge.html";
+                    } else {
+                        alert("修改失败，请重试！");
+                    }
+                }
+            })
+        }
+
+    }
+</script>
+</html>

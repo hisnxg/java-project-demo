@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.DoctorMapper">
+  <resultMap id="BaseResultMap" type="com.kkb.bean.Doctor">
+    <id column="d_id" jdbcType="INTEGER" property="dId" />
+    <result column="d_idCar" jdbcType="VARCHAR" property="dIdcar" />
+    <result column="d_phone" jdbcType="VARCHAR" property="dPhone" />
+    <result column="d_telPhone" jdbcType="VARCHAR" property="dTelphone" />
+    <result column="d_sex" jdbcType="INTEGER" property="dSex" />
+    <result column="d_birthday" jdbcType="DATE" property="dBirthday" />
+    <result column="d_age" jdbcType="INTEGER" property="dAge" />
+    <result column="d_email" jdbcType="VARCHAR" property="dEmail" />
+    <result column="d_keshi" jdbcType="VARCHAR" property="dKeshi" />
+    <result column="d_xueli" jdbcType="VARCHAR" property="dXueli" />
+    <result column="d_desc" jdbcType="VARCHAR" property="dDesc" />
+    <result column="d_inTime" jdbcType="DATE" property="dIntime" />
+    <result column="d_state" jdbcType="INTEGER" property="dState" />
+    <result column="d_name" jdbcType="VARCHAR" property="dName"/>
+  </resultMap>
+
+  <!--My Sql-->
+  <select id="selectDoctorByParam" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>,d_name
+    from doctor
+    where
+        1=1
+        <if test="userName != null and userName != ''">
+          AND d_name like concat('%',#{userName},'%')
+        </if>
+        <if test="keShi != null and keShi != ''">
+          AND d_keshi like  concat('%',#{keShi},'%')
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+          AND d_id like concat('%',#{doctorId},'%')
+        </if>
+  </select>
+
+  <select id="selectDoctorByName" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>,d_name
+    from doctor
+    where
+    1=1
+    <if test="userName!=null and userName != ''">
+      AND d_name = #{userName}
+    </if>
+    <if test="doctorId!=null and doctorId!=''">
+      AND d_id = #{doctorId}
+    </if>
+  </select>
+
+  <select id="selectDocterByIds" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>,d_name
+    from doctor
+    where
+    d_id in
+    <foreach collection="doctorIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+  <delete id="deleteDoctorByIds">
+    delete from doctor
+    where d_id in
+    <foreach collection="doctorIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectDoctorByKeshi" resultMap="BaseResultMap">
+    select *
+    from doctor
+    where d_keshi = #{keshi}
+  </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <sql id="Base_Column_List">
+    d_id, d_idCar, d_phone, d_telPhone, d_sex, d_birthday, d_age, d_email, d_keshi, d_xueli, 
+    d_desc, d_inTime, d_state
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />,d_name
+    from doctor
+    where d_id = #{dId,jdbcType=INTEGER}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from doctor
+    where d_id = #{dId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kkb.bean.Doctor">
+    insert into doctor (d_id, d_idCar, d_phone, 
+      d_telPhone, d_sex, d_birthday, 
+      d_age, d_email, d_keshi, 
+      d_xueli, d_desc, d_inTime, 
+      d_state,d_name)
+    values (#{dId,jdbcType=INTEGER}, #{dIdcar,jdbcType=VARCHAR}, #{dPhone,jdbcType=VARCHAR}, 
+      #{dTelphone,jdbcType=VARCHAR}, #{dSex,jdbcType=INTEGER}, #{dBirthday,jdbcType=DATE}, 
+      #{dAge,jdbcType=INTEGER}, #{dEmail,jdbcType=VARCHAR}, #{dKeshi,jdbcType=VARCHAR}, 
+      #{dXueli,jdbcType=VARCHAR}, #{dDesc,jdbcType=VARCHAR}, #{dIntime,jdbcType=DATE}, 
+      #{dState,jdbcType=INTEGER},#{dName})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kkb.bean.Doctor">
+    insert into doctor
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dId != null">
+        d_id,
+      </if>
+      <if test="dIdcar != null">
+        d_idCar,
+      </if>
+      <if test="dPhone != null">
+        d_phone,
+      </if>
+      <if test="dTelphone != null">
+        d_telPhone,
+      </if>
+      <if test="dSex != null">
+        d_sex,
+      </if>
+      <if test="dBirthday != null">
+        d_birthday,
+      </if>
+      <if test="dAge != null">
+        d_age,
+      </if>
+      <if test="dEmail != null">
+        d_email,
+      </if>
+      <if test="dKeshi != null">
+        d_keshi,
+      </if>
+      <if test="dXueli != null">
+        d_xueli,
+      </if>
+      <if test="dDesc != null">
+        d_desc,
+      </if>
+      <if test="dIntime != null">
+        d_inTime,
+      </if>
+      <if test="dState != null">
+        d_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dId != null">
+        #{dId,jdbcType=INTEGER},
+      </if>
+      <if test="dIdcar != null">
+        #{dIdcar,jdbcType=VARCHAR},
+      </if>
+      <if test="dPhone != null">
+        #{dPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="dTelphone != null">
+        #{dTelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="dSex != null">
+        #{dSex,jdbcType=INTEGER},
+      </if>
+      <if test="dBirthday != null">
+        #{dBirthday,jdbcType=DATE},
+      </if>
+      <if test="dAge != null">
+        #{dAge,jdbcType=INTEGER},
+      </if>
+      <if test="dEmail != null">
+        #{dEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="dKeshi != null">
+        #{dKeshi,jdbcType=VARCHAR},
+      </if>
+      <if test="dXueli != null">
+        #{dXueli,jdbcType=VARCHAR},
+      </if>
+      <if test="dDesc != null">
+        #{dDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="dIntime != null">
+        #{dIntime,jdbcType=DATE},
+      </if>
+      <if test="dState != null">
+        #{dState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.Doctor">
+    update doctor
+    <set>
+      <if test="dIdcar != null">
+        d_idCar = #{dIdcar,jdbcType=VARCHAR},
+      </if>
+      <if test="dPhone != null">
+        d_phone = #{dPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="dTelphone != null">
+        d_telPhone = #{dTelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="dSex != null">
+        d_sex = #{dSex,jdbcType=INTEGER},
+      </if>
+      <if test="dBirthday != null">
+        d_birthday = #{dBirthday,jdbcType=DATE},
+      </if>
+      <if test="dAge != null">
+        d_age = #{dAge,jdbcType=INTEGER},
+      </if>
+      <if test="dEmail != null">
+        d_email = #{dEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="dKeshi != null">
+        d_keshi = #{dKeshi,jdbcType=VARCHAR},
+      </if>
+      <if test="dXueli != null">
+        d_xueli = #{dXueli,jdbcType=VARCHAR},
+      </if>
+      <if test="dDesc != null">
+        d_desc = #{dDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="dIntime != null">
+        d_inTime = #{dIntime,jdbcType=DATE},
+      </if>
+      <if test="dState != null">
+        d_state = #{dState,jdbcType=INTEGER},
+      </if>
+      <if test="dName != null">
+        d_name = #{dName},
+      </if>
+    </set>
+    where d_id = #{dId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kkb.bean.Doctor">
+    update doctor
+    set d_idCar = #{dIdcar,jdbcType=VARCHAR},
+      d_phone = #{dPhone,jdbcType=VARCHAR},
+      d_telPhone = #{dTelphone,jdbcType=VARCHAR},
+      d_sex = #{dSex,jdbcType=INTEGER},
+      d_birthday = #{dBirthday,jdbcType=DATE},
+      d_age = #{dAge,jdbcType=INTEGER},
+      d_email = #{dEmail,jdbcType=VARCHAR},
+      d_keshi = #{dKeshi,jdbcType=VARCHAR},
+      d_xueli = #{dXueli,jdbcType=VARCHAR},
+      d_desc = #{dDesc,jdbcType=VARCHAR},
+      d_inTime = #{dIntime,jdbcType=DATE},
+      d_state = #{dState,jdbcType=INTEGER}
+    where d_id = #{dId,jdbcType=INTEGER}
+  </update>
+</mapper>

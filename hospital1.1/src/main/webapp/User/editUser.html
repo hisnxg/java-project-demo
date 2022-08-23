@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/style.css" />
+    <script type="text/javascript" src="../../Js/jquery.js"></script>
+    <!--<script type="text/javascript" src="../Js/jquery.sorted.js"></script>-->
+    <script type="text/javascript" src="../../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../Js/ckform.js"></script>
+    <script type="text/javascript" src="../../Js/common.js"></script>
+
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form id="myForm" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td class="tableleft">用户账户</td>
+            <td><input type="text" name="loginName"/></td>
+        </tr>
+        <tr>
+            <td class="tableleft">密码</td>
+            <td><input type="password" name="password"/></td>
+        </tr>
+        <tr>
+            <td class="tableleft">真实姓名</td>
+            <td><input type="text" name="trueName"/></td>
+        </tr>
+        <tr>
+            <td class="tableleft">邮箱</td>
+            <td><input type="text" name="email" value=""/></td>
+        </tr>
+        <tr>
+            <td class="tableleft">状态</td>
+            <td>
+                <input type="radio" name="status" value="0" checked/> 启用
+                <input type="radio" name="status" value="1" /> 禁用
+            </td>
+        </tr>
+        <tr>
+            <td class="tableleft">角色</td>
+            <td>
+                <!--隐藏input，存放下拉菜单中被选中角色的id，传递到后台-->
+                <input type="hidden" id="roleId" name="roleId" value="">
+                <select id="u_rid" name="u_rid"></select>
+            </td>
+        </tr>
+        <tr>
+            <td class="tableleft"></td>
+            <td>
+                <button id="btnEdit" class="btn btn-primary" type="button">更新
+                </button>&nbsp;&nbsp;<button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
+
+<script>
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+
+    $(function () {
+        //异步请求，编辑用户的页面的下拉菜单中填充所有角色
+        $.ajax({
+            type: "GET",
+            url: "/sysUser/roles",
+            data: "",//主要是分页和多条件参数数据
+            dataType:"json",
+            success: function(vo){
+                let list = vo.list;
+                for(let i = 0; i < list.length; i++){
+                    let id = list[i].id;
+                    let roleName = list[i].roleName;
+                    $("#u_rid").append('<option value="' + id + '">' + roleName + '</option>');
+                }
+            }
+        });
+
+        //给下拉菜单绑定change事件，当选中某个option后，获取它的value值，也就是角色的id，放入隐藏的input中，传递给后台
+        $("#u_rid").change(function () {
+            var roleId=$("#u_rid option:selected").val();
+            $("#roleId").val(roleId);
+        })
+
+        //从index页面传来的url，获取当前更新用户的id和当前页面的页码以及每页展现的页数
+        let url = document.location.toString();//获取URL
+        let userId=url.GetValue("userId");
+        let pageNum=url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+        //let query=url.GetValue("query");
+
+        //返回index页面
+        $('#backid').click(function(){
+            window.location.href = "index.html?pageNum="+pageNum+"&pageSize="+pageSize;
+        });
+
+
+        //根据用户id查询当前用户所有信息进行回显到更新的页面
+        queryById(userId);
+
+
+        //提交按钮的单击事件--添加
+        $("#btnEdit").click(function () {
+            $.ajax({
+                type: "POST",//这里必须写POST
+                url: "/sysUser/"+userId,  //id通过路径传递，更新数据通过表单传递
+                data: $("#myForm").serialize()+"&_method=PUT",
+                dataType:"json",
+                success: function(vo){
+                    if(vo.code==200) {
+                        window.location.href = "index.html?pageNum="+pageNum+"&pageSize="+pageSize;
+                    }else{
+                        alert("更新失败！"+vo.msg);
+                    }
+                }
+            });
+        });
+    });
+
+    //根据用户id查询当前用户所有信息进行回显到更新的页面
+    function queryById(userId) {
+        $.ajax({
+            type: "GET",
+            url: "/sysUser/"+userId, //RESTful风格的API定义
+            data: "",
+            success: function (vo) {
+                let obj=vo.obj;
+                console.log("要更新的roleId是:"+obj.roleId);
+                let loginName=obj.loginName;
+                let password=obj.password;
+                let trueName=obj.trueName;
+                let email=obj.email;
+                let status=obj.status;
+                let roleId=obj.roleId;
+                $("input[name='loginName']").val(loginName);
+                $("input[name='password']").val(password);
+                $("input[name='trueName']").val(trueName);
+                $("input[name='email']").val(email);
+                //根据后台给的roleId给对应的option添加属性selected，值为true
+                $("#u_rid option").removeAttr("selected");
+                $("#u_rid option[value='"+roleId+"']").attr("selected",true);
+                $("input[name='status'][value='" + status + "']").prop("checked", true);
+            }
+        });
+    }
+</script>

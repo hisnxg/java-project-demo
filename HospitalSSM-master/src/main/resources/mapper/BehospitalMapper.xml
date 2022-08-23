@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kkb.dao.BehospitalMapper">
+  <resultMap id="BaseResultMap" type="com.kkb.bean.Behospital">
+    <id column="beH_id" jdbcType="INTEGER" property="behId" />
+    <result column="beH_nursePeoPle" jdbcType="VARCHAR" property="behNursepeople" />
+    <result column="beH_patBed" jdbcType="VARCHAR" property="behPatbed" />
+    <result column="beH_antecedent" jdbcType="DECIMAL" property="behAntecedent" />
+    <result column="beH_illness" jdbcType="VARCHAR" property="behIllness" />
+    <result column="beH_closePrice" jdbcType="INTEGER" property="behCloseprice" />
+    <result column="beH_state" jdbcType="INTEGER" property="behState" />
+  </resultMap>
+
+  <resultMap id="BeHospitalResp" type="com.kkb.vo.hospzation.resp.BeHospitalResp">
+    <id column="beH_id" jdbcType="INTEGER" property="behId" />
+    <result column="beH_nursePeoPle" jdbcType="VARCHAR" property="behNursepeople" />
+    <result column="beH_patBed" jdbcType="VARCHAR" property="behPatbed" />
+    <result column="beH_antecedent" jdbcType="DECIMAL" property="behAntecedent" />
+    <result column="beH_closePrice" jdbcType="INTEGER" property="behCloseprice" />
+    <result column="hosR_state" jdbcType="INTEGER" property="hosrState" />
+    <result column="hosR_name" property="hosrName"/>
+    <result column="hosR_phone" property="hosrPhone"/>
+    <result column="d_id" property="doctorId"/>
+    <result column="d_name" property="doctorName"/>
+    <result column="d_keshi" property="keShi"/>
+    <result column="beH_intime" property="behIntime"/>
+    <result column="beH_closePrice" property="behCloseprice"/>
+  </resultMap>
+  <select id="selectBeHospital" resultMap="BeHospitalResp">
+    SELECT
+      beH_id,
+      hosR_name,
+      hosR_phone,
+      beH_antecedent,
+      doctor.d_id,
+      d_name,
+      d_keshi,
+      hosR_state,
+      beH_intime,
+      beH_patBed,
+      beH_closePrice
+    FROM
+      behospital,
+      hosregister,
+      doctor
+    where
+      behospital.beH_id = hosregister.hosR_id
+      and hosregister.d_id = doctor.d_id
+      <if test="behId!=null and behId!=''">
+        and beH_id like concat('%',#{behId},'%')
+      </if>
+      <if test="doctorName!=null and doctorName!=''">
+        and d_name like concat('%',#{doctorName},'%')
+      </if>
+      <if test="startTime!=null and startTime!=''">
+        and beH_intime &gt;= #{startTime}
+      </if>
+      <if test="endTime!=null and endTime!=''">
+        and beH_intime &lt;= #{endTime}
+      </if>
+      <if test="keShi!=null and keShi!=''">
+        and d_keshi like concat('%',#{keShi},'%')
+      </if>
+  </select>
+
+
+  <resultMap id="BeHospitalTotal" type="com.kkb.vo.hospzation.resp.BeHospitalTotal">
+    <id column="beH_id" jdbcType="INTEGER" property="behId" />
+    <result column="beH_nursePeoPle" jdbcType="VARCHAR" property="behNursepeople" />
+    <result column="beH_patBed" jdbcType="VARCHAR" property="behPatbed" />
+    <result column="beH_antecedent" jdbcType="DECIMAL" property="behAntecedent" />
+    <result column="beH_illness" jdbcType="VARCHAR" property="behIllness" />
+    <result column="beH_closePrice" jdbcType="INTEGER" property="behCloseprice" />
+    <result column="beH_state" jdbcType="INTEGER" property="behState" />
+    <result column="hosR_id" jdbcType="INTEGER" property="hosrId" />
+    <result column="hosR_idCar" jdbcType="VARCHAR" property="hosrIdcar" />
+    <result column="hosR_medical" jdbcType="VARCHAR" property="hosrMedical" />
+    <result column="hosR_regPrice" jdbcType="DECIMAL" property="hosrRegprice" />
+    <result column="hosR_phone" jdbcType="VARCHAR" property="hosrPhone" />
+    <result column="hosR_selfPrice" jdbcType="INTEGER" property="hosrSelfprice" />
+    <result column="hosR_sex" jdbcType="INTEGER" property="hosrSex" />
+    <result column="hosR_age" jdbcType="INTEGER" property="hosrAge" />
+    <result column="hosR_work" jdbcType="VARCHAR" property="hosrWork" />
+    <result column="hosR_lookDoctor" jdbcType="INTEGER" property="hosrLookdoctor" />
+    <result column="hosR_remark" jdbcType="VARCHAR" property="hosrRemark" />
+    <result column="hosR_state" jdbcType="INTEGER" property="hosrState" />
+    <result column="d_id" property="doctorId"/>
+    <result column="d_name" property="doctorName"/>
+    <result column="d_keshi" property="keShi"/>
+    <result column="hosR_name" property="hosrName"/>
+  </resultMap>
+  <select id="selectBehStateById" resultMap="BeHospitalTotal">
+    SELECT
+      behospital.*,
+      hosregister.*,
+      doctor.d_id,
+      d_name,
+      d_keshi,
+      hosR_name
+    FROM
+      `behospital`,
+      hosregister,
+      doctor
+    WHERE
+      behospital.beH_id = hosregister.hosR_id
+      AND hosregister.d_id = doctor.d_id
+      AND hosregister.hosR_id = #{hosrId}
+  </select>
+
+  <resultMap id="settle" type="com.kkb.vo.hospitalsettle.resp.HospitalSettleResp">
+    <id column="beH_id" jdbcType="INTEGER" property="behId" />
+    <result column="beH_antecedent" jdbcType="DECIMAL" property="behAntecedent" />
+    <result column="beH_closePrice" jdbcType="INTEGER" property="behCloseprice" />
+    <result column="hosR_name" property="hosrName"/>
+    <result column="balance" property="balance"/>
+    <result column="beH_closePrice" property="behCloseprice"/>
+  </resultMap>
+<!--  <select id="selectHospitalSettle" resultMap="settle">-->
+<!--    SELECT-->
+<!--      behospital.*,-->
+<!--      hosR_name,-->
+<!--      (behospital.beH_antecedent - balance ) as balance-->
+<!--    FROM-->
+<!--      behospital,-->
+<!--      hosregister,-->
+<!--      ( SELECT pricepeople.beH_id, sum( chargeproject.chaP_money ) AS balance FROM chargeproject, pricepeople WHERE chargeproject.chaP_id = pricepeople.chaP_id ) AS price-->
+<!--    WHERE-->
+<!--      behospital.beH_id = hosregister.hosR_id-->
+<!--      AND behospital.beH_id = price.beH_id-->
+<!--      <if test="id!=null and id !=''">-->
+<!--        and behospital.beH_id like concat('%',#{id},'%')-->
+<!--      </if>-->
+<!--      <if test="name!=null and name !=''">-->
+<!--        and hosR_name like concat('%',#{name},'%')-->
+<!--      </if>-->
+<!--  </select>-->
+  <select id="selectHospitalSettle" resultMap="settle">
+    SELECT
+      behospital.*,
+      hosR_name
+    FROM
+      behospital,
+      hosregister
+    WHERE
+      behospital.beH_id = hosregister.hosR_id
+      <if test="id!=null and id !=''">
+        and behospital.beH_id like concat('%',#{id},'%')
+      </if>
+      <if test="name!=null and name !=''">
+        and hosR_name like concat('%',#{name},'%')
+      </if>
+      <if test="behId!=null and behId !=''">
+        and beH_id = #{behId}
+      </if>
+  </select>
+
+  <select id="selectBeHospitalByIds" resultMap="BeHospitalResp">
+    SELECT
+      beH_id,
+      hosR_name,
+      hosR_phone,
+      beH_antecedent,
+      doctor.d_id,
+      d_name,
+      d_keshi,
+      hosR_state,
+      beH_intime,
+      beH_patBed
+    FROM
+      behospital,
+      hosregister,
+      doctor
+    where
+      behospital.beH_id = hosregister.hosR_id
+      and hosregister.d_id = doctor.d_id
+      and behospital.beH_id in
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+        #{id}
+      </foreach>
+  </select>
+
+  <select id="exportExcel" resultMap="settle">
+    SELECT
+    behospital.*,
+    hosR_name,
+    (behospital.beH_antecedent - balance ) as balance
+    FROM
+    behospital,
+    hosregister,
+    ( SELECT pricepeople.beH_id, sum( chargeproject.chaP_money ) AS balance FROM chargeproject, pricepeople WHERE chargeproject.chaP_id = pricepeople.chaP_id ) AS price
+    WHERE
+    behospital.beH_id = hosregister.hosR_id
+    AND behospital.beH_id = price.beH_id
+    AND behospital.beH_id in
+    <foreach collection="ids" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+
+
+
+
+
+
+
+
+
+
+
+  <sql id="Base_Column_List">
+    beH_id, beH_nursePeoPle, beH_patBed, beH_antecedent, beH_illness, beH_closePrice, 
+    beH_state
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from behospital
+    where beH_id = #{behId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from behospital
+    where beH_id = #{behId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kkb.bean.Behospital">
+    insert into behospital (beH_id, beH_nursePeoPle, beH_patBed, 
+      beH_antecedent, beH_illness, beH_closePrice, 
+      beH_state)
+    values (#{behId,jdbcType=INTEGER}, #{behNursepeople,jdbcType=VARCHAR}, #{behPatbed,jdbcType=VARCHAR}, 
+      #{behAntecedent,jdbcType=DECIMAL}, #{behIllness,jdbcType=VARCHAR}, #{behCloseprice,jdbcType=INTEGER}, 
+      #{behState,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kkb.bean.Behospital">
+    insert into behospital
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="behId != null">
+        beH_id,
+      </if>
+      <if test="behNursepeople != null">
+        beH_nursePeoPle,
+      </if>
+      <if test="behPatbed != null">
+        beH_patBed,
+      </if>
+      <if test="behAntecedent != null">
+        beH_antecedent,
+      </if>
+      <if test="behIllness != null">
+        beH_illness,
+      </if>
+      <if test="behCloseprice != null">
+        beH_closePrice,
+      </if>
+      <if test="behState != null">
+        beH_state,
+      </if>
+      <if test="behIntime != null">
+        beH_intime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="behId != null">
+        #{behId,jdbcType=INTEGER},
+      </if>
+      <if test="behNursepeople != null">
+        #{behNursepeople,jdbcType=VARCHAR},
+      </if>
+      <if test="behPatbed != null">
+        #{behPatbed,jdbcType=VARCHAR},
+      </if>
+      <if test="behAntecedent != null">
+        #{behAntecedent,jdbcType=DECIMAL},
+      </if>
+      <if test="behIllness != null">
+        #{behIllness,jdbcType=VARCHAR},
+      </if>
+      <if test="behCloseprice != null">
+        #{behCloseprice,jdbcType=INTEGER},
+      </if>
+      <if test="behState != null">
+        #{behState,jdbcType=INTEGER},
+      </if>
+      <if test="behIntime != null">
+        #{behIntime},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kkb.bean.Behospital">
+    update behospital
+    <set>
+      <if test="behNursepeople != null">
+        beH_nursePeoPle = #{behNursepeople,jdbcType=VARCHAR},
+      </if>
+      <if test="behPatbed != null">
+        beH_patBed = #{behPatbed,jdbcType=VARCHAR},
+      </if>
+      <if test="behAntecedent != null">
+        beH_antecedent = beH_antecedent + #{behAntecedent,jdbcType=DECIMAL},
+      </if>
+      <if test="behIllness != null">
+        beH_illness = #{behIllness,jdbcType=VARCHAR},
+      </if>
+      <if test="behCloseprice != null">
+        beH_closePrice = #{behCloseprice,jdbcType=INTEGER},
+      </if>
+      <if test="behState != null">
+        beH_state = #{behState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where beH_id = #{behId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kkb.bean.Behospital">
+    update behospital
+    set beH_nursePeoPle = #{behNursepeople,jdbcType=VARCHAR},
+      beH_patBed = #{behPatbed,jdbcType=VARCHAR},
+      beH_antecedent = #{behAntecedent,jdbcType=DECIMAL},
+      beH_illness = #{behIllness,jdbcType=VARCHAR},
+      beH_closePrice = #{behCloseprice,jdbcType=INTEGER},
+      beH_state = #{behState,jdbcType=INTEGER}
+    where beH_id = #{behId,jdbcType=INTEGER}
+  </update>
+</mapper>

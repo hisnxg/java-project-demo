@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>发药详情--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <!--<script type="text/javascript" src="../Js/jquery.sorted.js"></script>-->
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $('#newNav').click(function () {
+                window.location.href = "add.html";
+            });
+        });
+
+        function checkall() {
+            var alls = document.getElementsByName("check");
+            var ch = document.getElementById("checkall");
+            if (ch.checked) {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = true;
+                }
+            } else {
+                for (var i = 0; i < alls.length; i++) {
+                    alls[i].checked = false;
+                }
+            }
+        }
+
+        function delAll() {
+            var alls = document.getElementsByName("check");
+            var ids = new Array();
+            for (var i = 0; i < alls.length; i++) {
+                if (alls[i].checked) {
+                    ids.push(alls[i].value);
+                }
+            }
+            if (ids.length > 0) {
+                if (confirm("确认操作?")) {
+                    alert("成功!");
+                }
+            } else {
+                alert("请选中要操作的项");
+            }
+        }
+
+        $(function () {
+            $('#backid').click(function () {
+                window.location.href = "dispensing.html";
+            });
+        });
+    </script>
+</head>
+<body>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th>病历号</th>
+        <th>姓名</th>
+        <th>药品名称</th>
+        <th>药品数量</th>
+        <th>已发数量</th>
+        <th>未发数量</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="xunhuan">
+    <tr>
+        <td id="peopleId" style="vertical-align:middle;">1103</td>
+        <td id="hosrName" style="vertical-align:middle;">黄飞鸿</td>
+        <td id="drName" style="vertical-align:middle;">3402-九九感冒灵</td>
+        <td id="drNumber" style="vertical-align:middle;">3</td>
+        <td id="drNumberIssued" style="vertical-align:middle;">2</td>
+        <td id="drNumberWeifa" style="vertical-align:middle;">1</td>
+        <td style="vertical-align:middle;"><a href="#">发全</a>&nbsp;&nbsp;&nbsp;<a href="#">发1</a>&nbsp;&nbsp;&nbsp;<a
+                href="#">发5</a>&nbsp;&nbsp;&nbsp;<a href="#">发30</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="pages">
+<!--                <a href='#'>第一页</a> <a href='#'>上一页</a> <span class='current'>1</span><a href='#'>2</a><a-->
+<!--                    href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a> <a href='#'>下一页</a>-->
+<!--                <a href='#'>最后一页</a>-->
+<!--                &nbsp;&nbsp;&nbsp;共<span class='current'>32</span>条记录<span class='current'> 1/33 </span>页-->
+            </div>
+            <div>
+                <button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+            </div>
+
+        </th>
+    </tr>
+</table>
+
+</body>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#backid').click(function () {
+            window.location.href = "dispensing.html";
+        });
+
+        let peopleId = window.location.href.split("?")[1].split("=")[1];
+
+        //console.log(doctorId);
+        //发送ajax请求
+        $.ajax({
+            url: "selectDrugPeopleById",
+            data: {'peopleId': peopleId},
+            type: 'POST',
+            dataType: 'json',
+            success: function (resp) {
+                $("#xunhuan").empty();
+                if (resp.response.flag) {
+                    let page = resp.data.items;
+                    let list = page.list;
+                    $.each(list, function (index, drugpeople) {
+                        $("#xunhuan").append("<tr>" +
+                            "<td id=\"peopleId\" style=\"vertical-align:middle;\">" + drugpeople.peopleId + "</td>\n" +
+                            "        <td id=\"hosrName\" style=\"vertical-align:middle;\">" + drugpeople.hosrName + "</td>\n" +
+                            "        <td id=\"drName\" style=\"vertical-align:middle;\">" + drugpeople.drName + "</td>\n" +
+                            "        <td id=\"drNumber\" style=\"vertical-align:middle;\">" + drugpeople.drNumber + "</td>\n" +
+                            "        <td id=\"drNumberIssued\" style=\"vertical-align:middle;\">" + drugpeople.drNumberIssued + "</td>\n" +
+                            "        <td id=\"drNumberWeifa\" style=\"vertical-align:middle;\">" + drugpeople.drNumberWeifa + "</td>\n" +
+                            "        <td style=\"vertical-align:middle;\"><a onclick='fayao("+ drugpeople.peopleId +",-1,"+ drugpeople.drId +")' href=\"dispensing.html?peopleId=" + drugpeople.peopleId + "_1\" >发全</a>&nbsp;&nbsp;&nbsp;<a href=\"dispensing.html?peopleId=" + drugpeople.peopleId + "_2\"onclick='fayao("+ drugpeople.peopleId +",1,"+ drugpeople.drId +")' >发1</a>&nbsp;&nbsp;&nbsp;<a\n" +
+                            "         onclick='fayao("+ drugpeople.peopleId +",5,"+ drugpeople.drId +")'       href=\"dispensing.html?peopleId=" + drugpeople.peopleId + "_3\">发5</a>&nbsp;&nbsp;&nbsp;<a href=\"dispensing.html?peopleId=" + drugpeople.peopleId + "_4\" onclick='fayao("+ drugpeople.peopleId +",30,"+ drugpeople.drId +")'>发30</a></td>"
+                            + "</tr>"                                  //<a href=\"charge-edit1.html?chapId=" + chargeproject.chapId + "_1\">
+                        )
+
+                        //获取身份证号
+                        //changeIdCar(doctor.dIdcar)
+
+                        new Pagination({
+                            element: '#pages',
+                            type: 2,
+                            layout: 'prev, pager, next, total, jumper',
+                            pageIndex: 1,
+                            pageSize: 5,
+                            pageCount: 9,
+                            total: page.total,
+                            singlePageHide: false,
+                            disabled: true,
+                            currentChange: function (index) {
+                                console.log(index);
+
+                                let peopleId = $("#peopleId").val();
+                                $.ajax({
+                                    url: "selectDrugPeopleById",
+                                    data: {'peopleId': peopleId,"pageNum":index},
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    success: function (resp) {
+                                        $("#xunhuan").empty();
+                                        if (resp.response.flag) {
+                                            let page = resp.data.items;
+                                            let list = page.list;
+                                            $.each(list, function (index, drugpeople) {
+                                                $("#xunhuan").append("<tr>" +
+                                                    "<td id=\"peopleId\" style=\"vertical-align:middle;\">" + drugpeople.peopleId + "</td>\n" +
+                                                    "        <td id=\"hosrName\" style=\"vertical-align:middle;\">" + drugpeople.hosrName + "</td>\n" +
+                                                    "        <td id=\"drName\" style=\"vertical-align:middle;\">" + drugpeople.drName + "</td>\n" +
+                                                    "        <td id=\"drNumber\" style=\"vertical-align:middle;\">" + drugpeople.drNumber + "</td>\n" +
+                                                    "        <td id=\"drNumberIssued\" style=\"vertical-align:middle;\">" + drugpeople.drNumberIssued + "</td>\n" +
+                                                    "        <td id=\"drNumberWeifa\" style=\"vertical-align:middle;\">" + drugpeople.drNumberWeifa + "</td>\n" +
+                                                    "        <td style=\"vertical-align:middle;\"><a href=\"#\">发全</a>&nbsp;&nbsp;&nbsp;<a href=\"#\">发1</a>&nbsp;&nbsp;&nbsp;<a\n" +
+                                                    "                href=\"#\">发5</a>&nbsp;&nbsp;&nbsp;<a href=\"#\">发30</a></td>"
+                                                    + "</tr>"
+                                                )
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    })
+
+                }
+            }
+        })
+    });
+
+
+    if (window.location.href.indexOf("?") == -1) {
+
+    } else {
+        let flag = window.location.href.split("_")[1];
+        let id = window.location.href.split("?")[1].split("=")[1].split("_")[0];
+
+        console.log(flag);
+        console.log(id);
+
+        if (flag == 1) {
+            $.ajax({
+                url: "updateSendDrugAll",
+                data: {
+                    'peopleId': id,
+                },
+                type: 'POST',
+                //contentType: "application/json;charset=UTF-8",
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        let shuju = response.data;
+                        $("#drugNumber").val(shuju.drNumber);
+                        $("#drNumberIssued").val(shuju.drNumberIssued);
+                        $("#drNumberWeifa").val(shuju.drNumberWeifa);
+                    } else {
+                        alert("修改失败，请重试！");
+                    }
+                }
+            })
+            //设置为不可用
+            $("#bc").attr({"disabled": "disabled"})
+
+        } else if (flag == 2) {
+
+            $.ajax({
+                url: "updateSendDrug1",
+                data: {
+                    'peopleId': id,
+                },
+                type: 'POST',
+                //contentType: "application/json;charset=UTF-8",
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        let shuju = response.data;
+                        $("#drugNumber").val(shuju.drNumber);
+                        $("#drNumberIssued").val(shuju.drNumberIssued);
+                        $("#drNumberWeifa").val(shuju.drNumberWeifa);
+                    } else {
+                        alert("修改失败，请重试！");
+                    }
+                }
+            })
+            //设置为不可用
+            $("#bc").attr({"disabled": "disabled"});
+
+        } else if (flag == 3) {
+
+            $.ajax({
+                url: "hospital/updateSendDrug5",
+                data: {
+                    'peopleId': id,
+                },
+                type: 'POST',
+                //contentType: "application/json;charset=UTF-8",
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        let shuju = response.data;
+                        $("#drugNumber").val(shuju.drNumber);
+                        $("#drNumberIssued").val(shuju.drNumberIssued);
+                        $("#drNumberWeifa").val(shuju.drNumberWeifa);
+                    } else {
+                        alert("修改失败，请重试！");
+                    }
+                }
+            })
+            //设置为不可用
+            $("#bc").attr({"disabled": "disabled"});
+
+        } else if (flag == 4) {
+            $.ajax({
+                url: "hospital/updateSendDrug30",
+                data: {
+                    'peopleId': id,
+                },
+                type: 'POST',
+                //contentType: "application/json;charset=UTF-8",
+                dataType: 'json',
+                success: function (response) {
+                    if (response.response.flag) {
+                        let shuju = response.data;
+                        $("#drugNumber").val(shuju.drNumber);
+                        $("#drNumberIssued").val(shuju.drNumberIssued);
+                        $("#drNumberWeifa").val(shuju.drNumberWeifa);
+                    } else {
+                        alert("修改失败，请重试！");
+                    }
+                }
+            })
+            //设置为不可用
+            $("#bc").attr({"disabled": "disabled"});
+        }
+    }
+
+    function fayao(peopleId,yao,drugId){
+
+        $.ajax({
+            url: "/hospital/updateSendDrug",
+            data: {
+                'peopleId': peopleId,'yao':yao,'drugId':drugId
+            },
+            type: 'POST',
+            //contentType: "application/json;charset=UTF-8",
+            dataType: 'json',
+            success: function (response) {
+                console.log(response)
+                if (response.response.flag) {
+                    let shuju = response.data;
+                    $("#drugNumber").val(shuju.drNumber);
+                    $("#drNumberIssued").val(shuju.drNumberIssued);
+                    $("#drNumberWeifa").val(shuju.drNumberWeifa);
+                } else {
+                    alert(response.response.errorMsg())
+                }
+            }
+        })
+
+
+        return false;
+    }
+
+
+</script>
+</html>

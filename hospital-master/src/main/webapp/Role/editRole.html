@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../../Css/style.css" />
+    <script type="text/javascript" src="../../Js/jquery.js"></script>
+    <script type="text/javascript" src="../../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../../Js/ckform.js"></script>
+    <script type="text/javascript" src="../../Js/common.js"></script>
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<form id="myForm" class="definewidth m20" >
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">角色名称</td>
+        <td><input type="text" name="roleName" value=""/></td>
+    </tr>
+    <tr>
+        <td class="tableleft">状态</td>
+        <td>
+            <input type="radio" name="status" value="0" checked /> 启用
+           <input type="radio" name="status" value="1"  /> 禁用
+        </td>
+    </tr>
+    <tr>
+        <td class="tableleft">权限</td>
+        <td>
+            <div id="menu" name="menu"></div>
+		</td>
+    </tr>
+    <tr>
+        <td class="tableleft"></td>
+        <td>
+            <button id="btnEdit" class="btn btn-primary" type="button">更新</button> &nbsp;&nbsp;
+            <button type="button" class="btn btn-success" name="backid" id="backid">返回列表</button>
+        </td>
+    </tr>
+</table>
+</form>
+</body>
+</html>
+<script>
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+    $(function () {
+        //菜单回显
+        $.ajax({
+            type: "GET",
+            url: "/menu/all",
+            data: "",//主要是分页和多条件参数数据
+            dataType:"json",
+            success: function(vo){
+                let list = vo.list;
+                console.log("获取到的所有菜单:"+list);
+                let str = "";
+                for(let i = 0; i < list.length; i++){
+                    let roleId = list[i].id;
+                    let menuName = list[i].menuName;
+                    str += "<ul><label class='checkbox inline'><input type='checkbox' name='group' value=" + roleId + " />" + menuName + "</label></ul> "
+                }
+                $("#menu").html(str);
+            }
+        });
+
+        /*$(':checkbox[name="group[]"]').click(function () {
+            $(':checkbox', $(this).closest('li')).prop('checked', this.checked);
+        });*/
+
+        let url = document.location.toString();//获取URL
+        let roleId = url.GetValue("roleId");
+        let pageNum = url.GetValue("pageNum");
+        let pageSize=url.GetValue("pageSize");
+
+
+        //回显
+        queryById(roleId);
+
+        //更新
+        $("#btnEdit").click(function () {
+            let all=document.getElementsByName("group");
+            let list=[];
+            for(let i = 0; i < all.length; i++){
+                if(all[i].checked){
+                    list.push(all[i].value);
+                }
+            }
+            $.ajax({
+                type: "POST",//这里必须写POST
+                url: "/role/" + roleId,
+                data: $("#myForm").serialize() + "&_method=PUT",
+                dataType:"json",
+                success: function(vo){
+                    if(vo.code==200) {
+                        window.location.href = "index.html?pageNum="+pageNum+"&pageSize="+pageSize;
+                    }else{
+                        alert("更新失败！"+vo.msg);
+                    }
+                }
+            });
+        });
+    });
+
+    //返回index
+    $('#backid').click(function(){
+        window.location.href="index.html?pageNum=" + pageNum+"&pageSize="+pageSize;
+    });
+
+    //根据roleId获取角色信息回显
+    function queryById(roleId) {
+        $.ajax({
+            type: "GET",
+            url: "/role/"+roleId,
+            data: "",
+            success: function (vo) {
+                let role = vo.obj;
+                let roleName = role.roleName;
+                let status = role.status;
+                $("input[name='roleName']").val(roleName);
+                $("input[name='status'][value='" + status + "']").prop("checked", "checked");
+                let menuList=role.menuList;
+                console.log("角色:"+roleName+",菜单:"+menuList);
+                if (menuList!=null){
+                    for (let i=0;i<menuList.length;i++){
+                        $("input[name='group'][value='" + menuList[i].id + "']").prop("checked",true);
+                    }
+                }
+
+            }
+        });
+    }
+</script>

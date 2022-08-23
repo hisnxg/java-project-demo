@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>添加药品--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/ckeditor/ckeditor.js"></script>
+ 
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+
+    String.prototype.GetValue= function(para) {
+        let reg = new RegExp("(^|&)"+ para +"=([^&]*)(&|$)");
+        let r = this.substr(this.indexOf("\?")+1).match(reg);
+        if (r!=null) return unescape(r[2]); return null;
+    }
+    $(function () {
+        let url = document.location.toString();
+        let id=url.GetValue("id");
+        queryById(id);
+
+        $('#add_medicine').click(function(){
+            $.ajax({
+              type:"POST",
+              url:"/drug/"+id+"/"+ $("#resetNumber").html()+"/"+$("#increase").val(),
+              data:"&_method=PUT",
+              dataType:"json",
+              success: function(vo){
+                  if(vo.code==200) {
+                      window.location.href = "/medicine/index.html";
+                  }else{
+                      alert("添加失败！"+vo.msg);
+                  }
+              }
+            });
+        });
+
+		$('#backId').click(function(){
+				window.location.href="index.html";
+		 });
+    });
+
+    function queryById(id){
+        $.ajax({
+            type:"GET",
+            url: "/drug/"+id, //RESTFul风格的API定义
+            data: "",
+            dataType:"json",
+            success: function(vo){
+                let obj = vo.obj;
+                $("#id").html(obj.id);
+                $("#drugName").html(obj.drugName);
+                $("#resetNumber").html(obj.resetNumber);
+            }
+        });
+    }
+    </script>
+</head>
+<body>
+<form id="myForm" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft" >药品编号</td>
+        <td id="id" name="id">J1121</td>
+    </tr> 
+	
+    <tr>
+        <td width="10%" class="tableleft">药品名称</td>
+        <td id="drugName" name="drugName">感冒药</td>
+    </tr>    
+	<tr>
+        <td width="10%" class="tableleft">余量</td>
+        <td id="resetNumber" name="resetNumber">300</td>
+    </tr>    
+	
+    <tr>
+        <td width="10%" class="tableleft">数量</td>
+        <td>
+			<input id="increase" name="increase" type="text" value=""/>
+		</td>
+    </tr>
+	
+
+    <tr>
+        <td colspan="2">
+			<center>
+				<button type="button" class="btn btn-primary" name="add_medicine" id="add_medicine">增加库存</button> &nbsp;&nbsp;
+                <button type="button" class="btn btn-success" name="backId" id="backId">返回列表</button>
+			</center>
+		</td>
+    </tr>
+</table>
+</form>
+</body>
+</html>

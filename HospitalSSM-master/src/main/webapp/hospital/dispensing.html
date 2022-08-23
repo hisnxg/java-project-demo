@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>在院发药</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css"/>
+    <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+
+</head>
+<body>
+
+<form action="#" method="post" class="definewidth m20">
+    <table class="table table-bordered table-hover definewidth m10">
+        <tr>
+            <td width="10%" class="tableleft">病例号：</td>
+            <td><input id="peopleId" type="text" name="peopleId" onchange="yanzhneg()"/></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" class="btn btn-primary" type="button" onclick="queryDrugpeople()"
+                       value="查询"></input>
+                <button type="submit" class="btn btn-primary" type="button">清空</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>病历号</th>
+        <th>姓名</th>
+        <th>负责人</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+
+    <tbody id="xunhuan">
+    <tr>
+        <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+        <td style="vertical-align:middle;">1103</td>
+        <td style="vertical-align:middle;">黄飞鸿</td>
+        <td style="vertical-align:middle;">胡一得</td>
+        <td style="vertical-align:middle;"><a href="dispensing-give.html">发药</a>&nbsp;&nbsp;&nbsp;<a
+                href="dispensing-look.html">详情...</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <th colspan="5">
+            <div class="inline pull-right page" id="pages">
+<!--                <a href='#'>第一页</a> <a href='#'>上一页</a> <span class='current'>1</span><a href='#'>2</a><a-->
+<!--                    href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a> <a href='#'>下一页</a>-->
+<!--                <a href='#'>最后一页</a>-->
+<!--                &nbsp;&nbsp;&nbsp;共<span class='current'>32</span>条记录<span class='current'> 1/33 </span>页-->
+            </div>
+            <div>
+                <input type="button" class="btn btn-success" id="newNav" value="发药"/>
+
+            </div>
+
+        </th>
+    </tr>
+</table>
+
+</body>
+<script type="text/javascript">
+
+    function yanzhneg() {
+
+        console.log("sfdsdsdf")
+        let peopleId = $("#peopleId").val();
+        if (isNaN(peopleId)) {
+            alert("请输入数字");
+
+            $("#peopleId").val("");
+            console.log("1233");
+        }
+    }
+
+    $(function () {
+        $('#newNav').click(function () {
+            var ids = [];
+            $("input[name='check']:checked").each(function (i) {
+                ids.push($(this).val())
+            })
+            //判断是否大于0
+            if (ids.length > 0) {
+                let idsStr = "";
+                $.each(ids,function (index,item){
+                    idsStr += item+","
+                })
+                window.location.href = "dispensing-gives.html?ids="+idsStr.substring(0,idsStr.length-1);
+            } else {
+                alert("请选择发药的患者！");
+            }
+        });
+        //初始化数据
+        initData("");
+    });
+
+    function initData(peopleId) {
+        $.ajax({
+            url: "selectDrugpeopleByParam",
+            data: {'peopleId': peopleId},
+            type: 'post',
+            dataType: 'json',
+            success: function (data) {
+                //清空下级标签
+                $("#xunhuan").empty();
+                let page = data.data.drugpeople;
+                let param = data.data.param;
+                let list = page.list;
+                //遍历数据
+                $.each(list, function (index, drugpeople) {
+                    $("#xunhuan").append(
+                        "<tr >\n" +
+                        "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"" + drugpeople.peopleId + "\"></td>\n" +
+                        "    <td style=\"vertical-align:middle;\">" + drugpeople.peopleId + "</td>\n" +
+                        "    <td style=\"vertical-align:middle;\">" + drugpeople.hosrName + "</td>\n" +
+                        "    <td style=\"vertical-align:middle;\">" + drugpeople.dName + "</td>\n" +
+                        "    <td style=\"vertical-align:middle;\"><a href=\"dispensing-look.html?peopleId=" + drugpeople.peopleId + "\">详情>>></a>&nbsp;&nbsp;&nbsp;<a href=\"dispensing-give.html?peopleId=" + drugpeople.peopleId + "\">发药</a></td>\n" +
+                        "</tr>")
+
+                    //查询参数回显
+                    // $("#peopleId").val(drugpeople.peopleId);
+                    console.log(drugpeople.peopleId);
+
+                    //分页
+                    // $("#pageNum").text(page.pageNum + "/" + page.pages);
+                    // $("#totalMsg").text(page.pages);
+
+                    new Pagination({
+                        element: '#pages',
+                        type: 2,
+                        layout: 'prev, pager, next, total, jumper',
+                        pageIndex: 1,
+                        pageSize: 5,
+                        pageCount: 9,
+                        total: page.total,
+                        singlePageHide: false,
+                        disabled: true,
+                        currentChange: function (index) {
+                            console.log(index);
+
+                            let peopleId = $("#peopleId").val();
+                            $.ajax({
+                                url: "selectDrugpeopleByParam",
+                                data: {'peopleId': peopleId,'PageNum':index},
+                                type: 'post',
+                                dataType: 'json',
+                                success: function (data) {
+                                    //清空下级标签
+                                    $("#xunhuan").empty();
+                                    let page = data.data.drugpeople;
+                                    let param = data.data.param;
+                                    let list = page.list;
+                                    //遍历数据
+                                    $.each(list, function (index, drugpeople) {
+                                        $("#xunhuan").append(
+                                            "<tr >\n" +
+                                            "\t<td style=\"vertical-align:middle;\"><input type=\"checkbox\" name=\"check\" value=\"" + drugpeople.peopleId + "\"></td>\n" +
+                                            "    <td style=\"vertical-align:middle;\">" + drugpeople.peopleId + "</td>\n" +
+                                            "    <td style=\"vertical-align:middle;\">" + drugpeople.hosrName + "</td>\n" +
+                                            "    <td style=\"vertical-align:middle;\">" + drugpeople.dName + "</td>\n" +
+                                            "    <td style=\"vertical-align:middle;\"><a href=\"dispensing-look.html?peopleId=" + drugpeople.peopleId + "\">详情>>></a>&nbsp;&nbsp;&nbsp;<a href=\"dispensing-give.html?peopleId=" + drugpeople.peopleId + "\">发药</a></td>\n" +
+                                            "</tr>")
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    function queryDrugpeople() {
+        let peopleId = $("#peopleId").val();
+        initData(peopleId);
+    }
+
+    function formDate(toDate) {
+        var date = new Date(toDate);
+        var year = date.getFullYear(); //获取当前年份
+        var mon = date.getMonth() + 1; //获取当前月份
+        var da = date.getDate(); //获取当前日
+        var day = date.getDay(); //获取当前星期几
+        var h = date.getHours(); //获取小时
+        var m = date.getMinutes(); //获取分钟
+        var s = date.getSeconds(); //获取秒
+        var d = document.getElementById('Date');
+        return year + '-' + mon + '-' + da;
+    }
+
+    function checkall() {
+        var alls = document.getElementsByName("check");
+        var ch = document.getElementById("checkall");
+        if (ch.checked) {
+            for (var i = 0; i < alls.length; i++) {
+                alls[i].checked = true;
+            }
+        } else {
+            for (var i = 0; i < alls.length; i++) {
+                alls[i].checked = false;
+            }
+        }
+    }
+
+    function delAll() {
+        var alls = document.getElementsByName("check");
+        var ids = new Array();
+        for (var i = 0; i < alls.length; i++) {
+            if (alls[i].checked) {
+                ids.push(alls[i].value);
+            }
+        }
+        if (ids.length > 0) {
+            if (confirm("确认操作?")) {
+                alert("成功!");
+            }
+        } else {
+            alert("请选中要操作的项");
+        }
+    }
+</script>
+
+
+</html>

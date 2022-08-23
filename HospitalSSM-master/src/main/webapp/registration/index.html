@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>门诊查询--中软高科-2015</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../Js/jquery.js"></script>
+<!--
+    <script type="text/javascript" src="../Js/jquery.sorted.js"></script>
+-->
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/bootstrap-responsive.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/style.css" />
+    <link rel="stylesheet" type="text/css" href="../Css/pagination.css" />
+    <script type="text/javascript" src="../Js/bootstrap.js"></script>
+    <script type="text/javascript" src="../Js/ckform.js"></script>
+    <script type="text/javascript" src="../Js/common.js"></script>
+    <script type="text/javascript" src="../Js/pagination.js"></script>
+
+
+    <style type="text/css">
+        body {
+            padding-bottom: 40px;
+        }
+        .sidebar-nav {
+            padding: 9px 0;
+        }
+
+        @media (max-width: 980px) {
+            /* Enable use of floated navbar text */
+            .navbar-text.pull-right {
+                float: none;
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+
+
+    </style>
+    <script type="text/javascript">
+
+	 $(function () {
+		$('#newNav').click(function(){
+				window.location.href="add.html";
+		 });
+         //初始化数据
+         initData("","","","","");
+    });
+
+     function initData(hosrId,dName,dKeshi,startTime,endTime) {
+         $.ajax({
+             url: "http://localhost:8080/registration/queryRegistration",
+             data: {"hosrId": hosrId, 'dName': dName, 'dKeshi': dKeshi, 'startTime': startTime, 'endTime':  endTime},
+             type: 'get',
+             dataType: 'json',
+             success: function (data) {
+                 //清空下级标签
+                 $("#xunhuan").empty();
+                 let page = data.data.hosregisterpage;
+                 let param = data.data.param;
+                 let list = page.list;
+                 //遍历数据
+                 $.each(list, function (index, hosregister) {
+                     let temp;
+                     let xuanxiang;
+                     if(hosregister.hosrState == 0){
+                         temp = '已挂号';
+                         xuanxiang = "<a href=\"edit.html?hosrId="+hosregister.hosrId+"\">更改</a>&nbsp;&nbsp;&nbsp; " +
+                             "<a href=\"#\" onclick='updateTest(3)'>退号</a></td>";
+                     }else if(hosregister.hosrState == 1){
+                         temp = '已住院'
+                         xuanxiang = "<a href=\"edit.html?hosrId="+hosregister.hosrId+"\">更改</a>&nbsp;&nbsp;&nbsp; ";
+                     }else if(hosregister.hosrState == 2){
+                         temp = '已出院';
+                         xuanxiang = '';
+                     }else if(hosregister.hosrState == 3){
+                         temp = '已退号';
+                         xuanxiang = '';
+                     }else if (hosregister.hosrState == 4){
+                         temp = '已退院';
+                         xuanxiang = '';
+                     }
+
+
+                     let time = new Date(hosregister.hosrTime)
+                     let year = time.getFullYear()
+                     let month = time.getMonth() + 1
+                     let date = time.getDate()
+                  /*   let hours = time.getHours()
+                     let minute = time.getMinutes()
+                     let second = time.getSeconds()*/
+
+                     if (month < 10) { month = '0' + month }
+                     if (date < 10) { date = '0' + date }
+                     /*if (hours < 10) { hours = '0' + hours }
+                     if (minute < 10) { minute = '0' + minute }
+                     if (second < 10) { second = '0' + second }*/
+                     let dada =  year + '-' + month + '-' + date
+                    /*  + '-' + hours + ':' + minute + ':' + second*/
+
+
+
+                     $("#xunhuan").append(
+                         "<tr >\n" +
+                         "\t<td style=\"vertical-align:middle;\">" +
+                         "<input type=\"checkbox\" name=\"check\" value=\"" + hosregister.hosrId + "\"></td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" + hosregister.hosrId + "</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" + hosregister.doctor.dName + "</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" + dada + "</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" + hosregister.doctor.dKeshi + "</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" + temp + "</td>\n" +
+                         "    <td style=\"vertical-align:middle;\">" +
+                         "<a href=\"look.html?hosrId="+hosregister.hosrId+"\">详情>>></a>&nbsp;&nbsp;&nbsp;"+
+                         xuanxiang +
+                         "</tr>")
+
+                     //查询参数回显
+                     $("#hosrId").val(param.hosrId);
+                     $("#dName").val(param.dName);
+                     $("#dKeshi").val(param.dKeshi);
+                     $("#startTime").val(param.startTime);
+                     $("#endTime").val(param.endTime);
+
+                     //分页
+                     /**
+                      * layout 参数说明：
+                      *
+                      * total： 总条数
+                      * sizes: 显示每页条数选择框， TODO:pageSizes参数必填,否则无法生效
+                      * home： 首页按钮
+                      * prev： 上一页按钮
+                      * pager： 页码
+                      * last： 尾页按钮
+                      * next： 下一页按钮
+                      * jumper： 输入框跳转（包含事件：失去焦点，回车）触发
+                      *
+                      * */
+                     new Pagination({
+                         element: '#pages',
+                         type: 2,
+                         layout: 'prev, pager, next, total, jumper',
+                         pageIndex: 1,
+                         pageSize: 5,
+                         pageCount: 9,
+                         total: page.total,
+                         singlePageHide: false,
+                         disabled: true,
+                         currentChange: function(index) {
+                             console.log(index);
+                             $.ajax({
+                                 url: "http://localhost:8080/registration/queryRegistration",
+                                 data: {"pageNum":index,"hosrId": hosrId, 'dName': dName, 'dKeshi': dKeshi, 'startTime': startTime, 'endTime':  endTime},
+                                 type: 'get',
+                                 dataType: 'json',
+                                 success: function (data) {
+                                     //清空下级标签
+                                     $("#xunhuan").empty();
+                                     let page = data.data.hosregisterpage;
+                                     let param = data.data.param;
+                                     let list = page.list;
+                                     //遍历数据
+                                     $.each(list, function (index, hosregister) {
+                                         let temp;
+                                         let xuanxiang;
+                                         if(hosregister.hosrState == 0){
+                                             temp = '已挂号';
+                                             xuanxiang = "<a href=\"edit.html?hosrId="+hosregister.hosrId+"\">更改</a>&nbsp;&nbsp;&nbsp; " +
+                                                 "<a href=\"#\" onclick='tuihao("+hosregister.hosrId+",3)'>退号</a></td>";
+                                         }else if(hosregister.hosrState == 1){
+                                             temp = '已住院'
+                                             xuanxiang = "<a href=\"edit.html?hosrId="+hosregister.hosrId+"\">更改</a>&nbsp;&nbsp;&nbsp; ";
+                                         }else if(hosregister.hosrState == 2){
+                                             temp = '已出院';
+                                             xuanxiang = '';
+                                         }else if(hosregister.hosrState == 3){
+                                             temp = '已退号';
+                                             xuanxiang = '';
+                                         }else if (hosregister.hosrState == 4){
+                                             temp = '已退院';
+                                             xuanxiang = '';
+                                         }
+
+
+                                         let time = new Date(hosregister.hosrTime)
+                                         let year = time.getFullYear()
+                                         let month = time.getMonth() + 1
+                                         let date = time.getDate()
+                                         /*   let hours = time.getHours()
+                                            let minute = time.getMinutes()
+                                            let second = time.getSeconds()*/
+
+                                         if (month < 10) { month = '0' + month }
+                                         if (date < 10) { date = '0' + date }
+                                         /*if (hours < 10) { hours = '0' + hours }
+                                         if (minute < 10) { minute = '0' + minute }
+                                         if (second < 10) { second = '0' + second }*/
+                                         let dada =  year + '-' + month + '-' + date
+                                         /*  + '-' + hours + ':' + minute + ':' + second*/
+
+
+
+                                         $("#xunhuan").append(
+                                             "<tr >\n" +
+                                             "\t<td style=\"vertical-align:middle;\">" +
+                                             "<input type=\"checkbox\" name=\"check\" value=\"" + hosregister.hosrId + "\"></td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" + hosregister.hosrId + "</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" + hosregister.doctor.dName + "</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" + dada + "</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" + hosregister.doctor.dKeshi + "</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" + temp + "</td>\n" +
+                                             "    <td style=\"vertical-align:middle;\">" +
+                                             "<a href=\"look.html?hosrId="+hosregister.hosrId+"\">详情>>></a>&nbsp;&nbsp;&nbsp;"+
+                                             xuanxiang +
+                                             "</tr>")
+
+                                         //查询参数回显
+                                         $("#hosrId").val(param.hosrId);
+                                         $("#dName").val(param.dName);
+                                         $("#dKeshi").val(param.dKeshi);
+                                         $("#startTime").val(param.startTime);
+                                         $("#endTime").val(param.endTime);
+                                     })
+                                 }
+                             });
+                         }
+                     })
+                 })
+             }
+         });
+     }
+
+         function queryRegistration(){
+             let hosrId = $("#hosrId").val();
+             let dName = $("#dName").val();
+             let dKeshi = $("#dKeshi").val();
+             let startTime = $("#startTime").val();
+             let endTime = $("#endTime").val();
+             initData(hosrId,dName,dKeshi,startTime,endTime);
+         }
+
+         function resetQuery() {
+             $("#hosrId").val("");
+             $("#dName").val("");
+             $("#dKeshi").val("");
+             $("#startTime").val("");
+             $("#endTime").val("");
+             queryRegistration();
+         }
+
+    	function checkall(){
+			var alls=document.getElementsByName("check");
+			var ch=document.getElementById("checkall");
+			if(ch.checked){
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=true;	
+				}	
+			}else{
+				for(var i=0;i<alls.length;i++){
+					alls[i].checked=false;	
+				}	
+			}
+		}
+		function delAll(){
+			var alls=document.getElementsByName("check");
+			var ids=new Array();
+			for(var i=0;i<alls.length;i++){
+				if(alls[i].checked){
+					ids.push(alls[i].value);
+				}		
+			}
+			if(ids.length>0){
+				if(confirm("确认操作?")){
+					alert("成功!");
+				}
+			}else{
+				alert("请选中要操作的项");
+			}
+		}
+
+     //批量修改挂号状态
+     function updateTest(status) {
+         var ids = [];
+         $("input[name='check']:checked").each(function (i) {
+             ids.push($(this).val())
+             // $("body").append("<p>"+$(this).val()+"</p>")
+         })
+         //console.log(ids)
+         if (ids.length > 0) {
+             $.ajax({
+                 url: "updateTest",
+                 data: {"hosrId": ids,'hosrState':status},
+                 traditional: true,
+                 success: function (resp) {
+                     console.log("---")
+                     if (resp.response.flag) {
+                         alert("退号成功！");
+                         window.location.href="index.html";
+                     } else {
+                         alert(resp.response.errorMsg);
+                     }
+                     initData("", "", "", "", "")
+                 }
+             })
+         } else {
+             //挂号状态：0挂号 1已住院 2已出院 3已退号
+             if (status == 3) {
+                 alert("请选择的要出院的患者");
+             } else {
+                 alert("请选择的要退院的患者");
+             }
+         }
+     }
+
+     function tuihao(ids,status){
+         $.ajax({
+             url: "updateTest",
+             data: {"hosrId": ids,'hosrState':status},
+             traditional: true,
+             success: function (resp) {
+                 console.log("---")
+                 if (resp.response.flag) {
+                     alert("退号成功！");
+                     window.location.href="index.html";
+                 } else {
+                     alert(resp.response.errorMsg);
+                 }
+                 initData("", "", "", "", "")
+             }
+         })
+
+         let hosrId = $("#hosrId").val();
+         let dName = $("#dName").val();
+         let dKeshi = $("#dKeshi").val();
+         let startTime = $("#startTime").val();
+         let endTime = $("#endTime").val();
+         initData(hosrId,dName,dKeshi,startTime,endTime);
+     }
+
+     //导出excel
+     function exportExcel() {
+         var ids = [];
+         $("input[name='check']:checked").each(function (i) {
+             ids.push($(this).val())
+             //$("body").append("<p>"+$(this).val()+"</p>")
+         })
+         //console.log(ids)
+         if (ids.length > 0) {
+             $.ajax({
+                 url: "exportExcel",
+                 data: {"id": ids},
+                 traditional: true,
+                 success: function (resp) {
+                     if (resp.response.flag) {
+                         console.log("sdfsdf");
+                         window.location.href = "http://localhost:8080/downloadFile?fileName=hosregisterMsg.xls";
+                         console.log("sdfsdf");
+                     } else {
+
+                     }
+                 }
+             })
+         } else {
+             alert("请选择要导出的数据");
+         }
+     }
+    </script>
+</head>
+<body>
+
+<form action="#" method="post" class="definewidth m20">
+<table class="table table-bordered table-hover definewidth m10">
+    <tr>
+        <td width="10%" class="tableleft">病历号：</td>
+        <td><input id="hosrId" type="text" name="hosrId" value=""/></td>
+		
+        <td width="10%" class="tableleft">主治医生：</td>
+        <td><input id="dName" type="text" name="dName" value=""/></td>
+		
+        <td width="10%" class="tableleft">科室：</td>
+        <td><input id="dKeshi" type="text" name="dKeshi" value=""/></td>
+    </tr>
+    <tr>
+		
+        <td width="10%" class="tableleft" >挂号时间：</td>
+		
+		  <td colspan="5">
+			<input id="startTime" type="date"   value=  ""  />&nbsp;至&nbsp;
+              <input id="endTime" type="date" value=""/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button id="CX" type="button" class="btn btn-primary" type="button" onclick="queryRegistration()">查询</button>
+            <button type="button" class="btn btn-primary" type="button" onclick="resetQuery()">清空</button>
+			
+        </td>
+    </tr>
+</table>
+</form>
+   
+<table class="table table-bordered table-hover definewidth m10" >
+   <thead>
+    <tr>
+    	<th><input type="checkbox" id="checkall" onChange="checkall();"></th>
+        <th>门诊编号</th>
+        <th>主治医生</th>
+        <th>挂号时间</th>
+        <th>挂号科室</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody id="xunhuan">
+        <tr >
+            <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+            <td style="vertical-align:middle;">1103</td>
+            <td style="vertical-align:middle;">程俊</td>
+            <td style="vertical-align:middle;">2015-09-09 12：12：12</td>
+            <td style="vertical-align:middle;">血液科</td>
+            <td style="vertical-align:middle;">已挂号</td>
+            <td style="vertical-align:middle;">
+                <a href="look.html">详情>>></a>&nbsp;&nbsp;&nbsp;
+                <a href="edit.html">更改</a>&nbsp;&nbsp;&nbsp;
+                <a href="javascript:alert('退号成功！');">退号</a></td>
+        </tr>
+    </tbody>
+
+  </table>
+  
+  <table class="table table-bordered table-hover definewidth m10" >
+  	<tr><th colspan="5">  <div class="inline pull-right page" id="pages">
+          <!--<a href='#' >第一页</a> <a href='#'>上一页</a>
+        <span class='current'>1</span>
+        <a href='#' >下一页</a> <a href='#' >最后一页</a>&nbsp;&nbsp;&nbsp;
+        共<span id="totalMsg" class='current'></span>条记录
+        <span id="pageNum" class='current'>  </span>页-->
+		  </div>
+		 <div><button type="button" class="btn btn-success" id="newNav">门诊挂号</button>&nbsp;&nbsp;&nbsp;
+		 <button type="button" class="btn btn-success" id="tui" onclick="updateTest(3)">退号</button>&nbsp;&nbsp;&nbsp;
+		 <button type="button" class="btn btn-success" id="delPro2" onclick="exportExcel()">导出Excel</button>
+
+		 </div>
+		 
+		 </th></tr>
+  </table>
+  
+</body>
+
+</html>
